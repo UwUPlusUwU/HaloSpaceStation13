@@ -1,16 +1,14 @@
 
+#include "../../code/modules/halo/covenant/invasion_scanner.dm"
+
 #include "../npc_ships/om_ship_areas.dm"
 #include "../area_holders/overmap_ship_area_holder.dmm"
 
-#include "../Exoplanet Research/includes.dm"
+#include "co_ord_console.dm"
 
 #include "../Admin Planet/includes.dm"
 
-#include "../UNSC_Halberd_Class/includes.dm"
-
-#include "../ONI_Prowler/outfits.dm"
-
-#include "../ONI_Prowler/jobs.dm"
+#include "../faction_bases/ODP_Cassius/ODP_Cassius.dm"
 
 #include "../SOE_Argentum/jobs.dm"
 #include "../SOE_Argentum/outfits.dm"

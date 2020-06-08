@@ -1,5 +1,7 @@
 #define VEHICLE_CONNECT_DELAY 7.5 SECONDS
 #define VEHICLE_ITEM_LOAD 3.0 SECONDS
+#define TAKEOFF_LAND_DELAY 4 SECONDS
+#define WAYPOINT_FLIGHT_DELAY 7.5 SECONDS
 
 /obj/vehicles/air
 	name = "Dropship"
@@ -15,6 +17,9 @@
 	plane = ABOVE_HUMAN_PLANE
 
 	active = 0
+
+	can_traverse_zs = 1
+	can_space_move = 1
 
 	var/faction = null //The faction this vehicle belongs to. Setting this will restrict landing to faction-owned and Civilian points only
 
@@ -33,7 +38,7 @@
 			playsound(src,takeoff_sound,100,0)
 	var/takeoff_overlay = image(icon,takeoff_overlay_icon_state)
 	overlays += takeoff_overlay
-	pass_flags = PASSTABLE | PASSGLASS | PASSGRILLE
+	pass_flags = PASSTABLE | PASSGRILLE
 	block_enter_exit = 1
 
 /obj/vehicles/air/proc/land_vehicle(var/message_n_sound_override = 0)
@@ -58,6 +63,10 @@
 		return
 	if(!(usr in get_occupants_in_position("driver")))
 		to_chat(usr,"<span class = 'notice'>You need to be the driver of [name] to do that!</span>")
+		return
+	to_chat(usr,"<span class = 'notice'>You start prepping [src] for [active ? "landing" : "takeoff"].</span>")
+	visible_message("<span class = 'notice'>[src] starts prepping for [active?"landing":"takeoff"].</span>")
+	if(!do_after(usr,TAKEOFF_LAND_DELAY,src))
 		return
 	if(active)
 		land_vehicle()
@@ -104,6 +113,14 @@
 	if(!active)
 		to_chat(usr,"<span class = 'notice'>You need to be in the air to do that!.</span>")
 		return
+	if(world.time < ticker.mode.ship_lockdown_until)
+		to_chat(usr,"<span class = 'notice'>[src] is still finalising long-range deployment preparations!</span>")
+		return
+
+	to_chat(usr,"<span class = 'notice'>You start prepping [src] for long-range flight..</span>")
+	visible_message("<span class = 'notice'>[src] starts prepping for long-range flight..</span>")
+	if(!do_after(usr,WAYPOINT_FLIGHT_DELAY,src))
+		return
 	proc_fly_to_waypoint()
 
 /obj/vehicles/air/inactive_pilot_effects()
@@ -113,10 +130,7 @@
 		return
 	visible_message("<span class = 'danger'>[name] spirals towards the ground, engines uncontrolled!!</span>")
 	for(var/mob/living/carbon/human/h in occupants)
-		if(prob(15))
-			h.adjustBruteLoss(rand(25,50))
-		else
-			h.adjustBruteLoss(rand(5,20))
+		h.adjustBruteLoss(rand(20,50))
 	kick_occupants()
 	land_vehicle(1)
 	if(crash_sound)

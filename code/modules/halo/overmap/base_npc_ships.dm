@@ -39,7 +39,7 @@
 	var/list/messages_on_hit = ON_PROJECTILE_HIT_MESSAGES
 	var/list/messages_on_death = ON_DEATH_MESSAGES
 	var/radio_language = "Galactic Common"
-	var/radio_channel = "System"
+	var/radio_channel = RADIO_HUMAN
 
 	var/hull = 1000 //Essentially used to tell the ship when to "stop" trying to move towards it's area.
 
@@ -116,7 +116,7 @@
 		return 1
 	if(hull < initial(hull)/4)
 		return 1
-	if(isnull(target_loc))
+	if(isnull(target_loc) || target_loc == loc)
 		return 1
 	return 0
 
@@ -124,7 +124,7 @@
 	//check if we're still on cooldown from last radio message
 	if(world.time >= last_radio_time + radio_cooldown || ignore_cooldown)
 		last_radio_time = world.time
-		GLOB.global_headset.autosay(message, src.name, radio_channel, radio_language)
+		GLOB.global_announcer.autosay(message, src.name, radio_channel, radio_language)
 	else
 		//otherwise queue it up
 		//note: if there is lots of radio spam some messages will be lost so only send the latest message
@@ -157,23 +157,22 @@
 	walk(src,0)
 	if(isnull(loc))
 		return
-	if(our_fleet && our_fleet.leader_ship != src)
-		target_loc = pick(range(FLEET_STICKBY_RANGE,our_fleet.leader_ship.loc))
+	if(our_fleet && our_fleet.leader_ship != src && our_fleet.leader_ship.loc != null)
+		target_loc = pick(trange(FLEET_STICKBY_RANGE,our_fleet.leader_ship.loc))
 		return
 	var/list/sectors_onmap = list()
 	for(var/type in typesof(/obj/effect/overmap/sector) - /obj/effect/overmap/sector)
 		var/obj/effect/overmap/om_obj = locate(type)
-		if(om_obj && !isnull(om_obj.loc) && om_obj.base && my_faction && !(om_obj.get_faction() in my_faction.enemy_factions)) //Only even try going if it's a "base" object
+		if(om_obj && !isnull(om_obj.loc) && om_obj.base && my_faction && !(om_obj.get_faction() in my_faction.enemy_faction_names)) //Only even try going if it's a "base" object
 			sectors_onmap += om_obj
 	if(sectors_onmap.len == 0)
 		target_loc = pick(GLOB.overmap_tiles_uncontrolled)
 	else
 		var/obj/chosen = pick(sectors_onmap)
-		var/list/turfs_nearobj = list()
-		for(var/turf/unsimulated/map/t in range(7,chosen))
+		var/list/turfs_nearobj = trange(7,chosen)
+		for(var/t in turfs_nearobj)
 			if(istype(t,/turf/unsimulated/map/edge))
-				continue
-			turfs_nearobj += t
+				turfs_nearobj -= t
 		if(turfs_nearobj.len > 0)
 			target_loc = pick(turfs_nearobj)
 		else

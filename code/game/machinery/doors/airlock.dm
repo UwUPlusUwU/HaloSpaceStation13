@@ -206,6 +206,10 @@ var/list/airlock_overlays = list()
 	door_color = COLOR_WHITE
 	stripe_color = COLOR_VIOLET
 
+/obj/machinery/door/airlock/glass/chemistry
+	door_color = COLOR_WHITE
+	stripe_color = COLOR_PALE_ORANGE
+
 /obj/machinery/door/airlock/glass/sol
 	door_color = COLOR_BLUE_GRAY
 	stripe_color = COLOR_AMBER
@@ -846,6 +850,32 @@ About the new airlock wires panel:
 		if(src.isElectrified())
 			if(src.shock(user, 100))
 				return
+	var/mob/living/carbon/human/h = user
+
+	if (istype(h) && h.species.can_force_door == 1 && h.a_intent == I_GRAB)
+		if(arePowerSystemsOn() && !locked && !brace)
+			to_chat(h,"<span class='notice'>The airlock's motors are resisting your efforts to force it, but you're strong enough to overcome them.</span>")
+			if(!do_after(h, 5 SECONDS,src))
+				to_chat(h,"<span class = 'notice'>You stop forcing the airlock.</span>")
+				return
+			if(density)
+				to_chat(h,"<span class = 'notice'>You force the airlock open.</span>")
+				open()
+			else
+				to_chat(h,"<span class = 'notice'>You force the airlock closed.</span>")
+				close()
+
+		else if (locked)
+			to_chat(user, "<span class='notice'>The airlock's bolts prevent it from being forced.</span>")
+		else if(brace)
+			to_chat(user, "<span class='notice'>The airlock's brace holds it firmly in place.</span>")
+		else
+			if (density)
+				to_chat(h,"<span class = 'notice'>You force the airlock open.</span>")
+				open(1)
+			else
+				to_chat(h,"<span class = 'notice'>You force the airlock closed.</span>")
+				close(1)
 
 	if(src.p_open)
 		user.set_machine(src)
@@ -874,17 +904,33 @@ About the new airlock wires panel:
 	if(..())
 		return 1
 
+	var/mob/living/silicon/ai/ai = usr
+	var/do_ai_check = 0
+	if(istype(ai))
+		do_ai_check = 1
 	var/activate = text2num(href_list["activate"])
 	switch (href_list["command"])
 		if("idscan")
+			if(do_ai_check && ai.check_access_level(src) > 4)
+				to_chat(ai,"<span class = 'notice'>You need access level 4 to do that.</span>")
+				return
 			set_idscan(activate, 1)
 		if("main_power")
+			if(do_ai_check && ai.check_access_level(src) > 3)
+				to_chat(ai,"<span class = 'notice'>You need access level 3 to do that.</span>")
+				return
 			if(!main_power_lost_until)
 				src.loseMainPower()
 		if("backup_power")
+			if(do_ai_check && ai.check_access_level(src) > 4)
+				to_chat(ai,"<span class = 'notice'>You need access level 4 to do that.</span>")
+				return
 			if(!backup_power_lost_until)
 				src.loseBackupPower()
 		if("bolts")
+			if(do_ai_check && ai.check_access_level(src) > 4)
+				to_chat(ai,"<span class = 'notice'>You need access level 4 to do that.</span>")
+				return
 			if(src.isWireCut(AIRLOCK_WIRE_DOOR_BOLTS))
 				to_chat(usr, "The door bolt control wire is cut - Door bolts permanently dropped.")
 			else if(activate && src.lock())
@@ -892,10 +938,19 @@ About the new airlock wires panel:
 			else if(!activate && src.unlock())
 				to_chat(usr, "The door bolts have been raised.")
 		if("electrify_temporary")
+			if(do_ai_check && ai.check_access_level(src) > 3)
+				to_chat(ai,"<span class = 'notice'>You need access level 3 to do that.</span>")
+				return
 			electrify(30 * activate, 1)
 		if("electrify_permanently")
+			if(do_ai_check && ai.check_access_level(src) > 4)
+				to_chat(ai,"<span class = 'notice'>You need access level 4 to do that.</span>")
+				return
 			electrify(-1 * activate, 1)
 		if("open")
+			if(do_ai_check && ai.check_access_level(src) > 3)
+				to_chat(ai,"<span class = 'notice'>You need access level 3 to do that.</span>")
+				return
 			if(src.welded)
 				to_chat(usr, text("The airlock has been welded shut!"))
 			else if(src.locked)
@@ -905,8 +960,14 @@ About the new airlock wires panel:
 			else if(!activate && !density)
 				close()
 		if("safeties")
+			if(do_ai_check && ai.check_access_level(src) > 3)
+				to_chat(ai,"<span class = 'notice'>You need access level 3 to do that.</span>")
+				return
 			set_safeties(!activate, 1)
 		if("timing")
+			if(do_ai_check && ai.check_access_level(src) > 3)
+				to_chat(ai,"<span class = 'notice'>You need access level 3 to do that.</span>")
+				return
 			// Door speed control
 			if(src.isWireCut(AIRLOCK_WIRE_SPEED))
 				to_chat(usr, text("The timing wire is cut - Cannot alter timing."))
@@ -916,6 +977,9 @@ About the new airlock wires panel:
 				normalspeed = 1
 		if("lights")
 			// Lights
+			if(do_ai_check && ai.check_access_level(src) > 3)
+				to_chat(ai,"<span class = 'notice'>You need access level 3 to do that.</span>")
+				return
 			if(src.isWireCut(AIRLOCK_WIRE_LIGHT))
 				to_chat(usr, "The lights wire is cut - The door lights are permanently disabled.")
 			else if (!activate && src.lights)
@@ -1364,9 +1428,13 @@ About the new airlock wires panel:
 		electronics.one_access = 1
 
 /obj/machinery/door/airlock/emp_act(var/severity)
+
 	if(prob(20/severity))
 		spawn(0)
 			open()
+	if(prob(10/severity))
+		spawn(0)
+			lock()
 	if(prob(40/severity))
 		var/duration = SecondsToTicks(30 / severity)
 		if(electrified_until > -1 && (duration + world.time) > electrified_until)

@@ -64,25 +64,25 @@
 	icon = ITEM_INHAND
 	icon_override = MARINE_OVERRIDE
 	item_state = "CH252 Helmet B"
-	icon_state = "helmet_b"
+	icon_state = "helmet_novisor_b"
 	body_parts_covered = HEAD|EYES
 
 /obj/item/clothing/head/helmet/marine/medic/brown
-	name = "Brown Camo CH251 Helmet"
+	name = "Brown Camo CH251 Helmet Medic"
 	desc = "The standard issue combat helmet worn by the members of the UNSC Marine Corps, UNSC Army, and UNSC Air Force. Has an inbuilt VISOR for eye protection."
 	icon = ITEM_INHAND
 	icon_override = MARINE_OVERRIDE
 	item_state = "CH252 Helmet Medic B"
-	icon_state = "helmet medic-b_obj"
+	icon_state = "helmet novisor medic-b_obj"
 	body_parts_covered = HEAD|EYES
 
 /obj/item/clothing/head/helmet/marine/medic/brownvisor
-	name = "Brown Camo CH251 Helmet"
+	name = "Brown Camo CH251-V Helmet Medic"
 	desc = "The standard issue combat helmet worn by the members of the UNSC Marine Corps, UNSC Army, and UNSC Air Force. Has an inbuilt VISOR for eye protection."
 	icon = ITEM_INHAND
 	icon_override = MARINE_OVERRIDE
 	item_state = "CH252 Visor Helmet Medic B"
-	icon_state = "helmet medic-b_obj"
+	icon_state = "helmet medic_obj"
 	body_parts_covered = HEAD|EYES
 
 /obj/item/clothing/head/helmet/marine/brownvisor
@@ -165,10 +165,13 @@
 	item_state = "boots"
 	icon_state = "boots"
 	force = 5
-	armor = list(melee = 40, bullet = 40, laser = 5, energy = 20, bomb = 15, bio = 0, rad = 0)
+	armor = list(melee = 40, bullet = 40, laser = 5, energy = 30, bomb = 15, bio = 0, rad = 0)
 	siemens_coefficient = 0.6
 	body_parts_covered = FEET|LEGS
 	can_hold_knife = 1
+	item_state_slots = list(
+	slot_l_hand_str = "boots",
+	slot_r_hand_str = "boots" )
 	stepsound = 'code/modules/halo/sounds/walk_sounds/marine_boots.ogg'
 	cold_protection = FEET
 	min_cold_protection_temperature = SHOE_MIN_COLD_PROTECTION_TEMPERATURE
@@ -204,7 +207,29 @@
 	item_state = "UNSC Marine Medical Belt"*/
 	storage_slots = 5
 
-	can_hold = list(/obj/item/ammo_magazine/m5,/obj/item/ammo_magazine/m127_saphp,/obj/item/ammo_magazine/m127_saphe,/obj/item/weapon/storage/firstaid/unsc,/obj/item/weapon/storage/firstaid/erk,/obj/item/weapon/storage/firstaid/combat/unsc)
+	can_hold = list(\
+	/obj/item/ammo_magazine/m5,
+	/obj/item/ammo_magazine/m127_saphp,
+	/obj/item/ammo_magazine/m127_saphe,
+	/obj/item/weapon/storage/firstaid/unsc,
+	/obj/item/weapon/storage/firstaid/erk,
+	/obj/item/weapon/storage/firstaid/combat/unsc,
+	/obj/item/device/healthanalyzer,
+	/obj/item/weapon/reagent_containers/dropper,
+	/obj/item/weapon/reagent_containers/glass/beaker,
+	/obj/item/weapon/reagent_containers/glass/bottle,
+	/obj/item/weapon/reagent_containers/syringe,
+	/obj/item/weapon/flame/lighter/zippo,
+	/obj/item/weapon/storage/fancy/cigarettes,
+	/obj/item/weapon/storage/pill_bottle,
+	/obj/item/stack/medical,
+	/obj/item/device/flashlight/pen,
+	/obj/item/clothing/mask/surgical,
+	/obj/item/clothing/head/surgery,
+	/obj/item/clothing/gloves/latex,
+	/obj/item/weapon/reagent_containers/hypospray,
+	/obj/item/clothing/glasses/hud/health
+	)
 
 /obj/item/clothing/mask/marine
 	name = "Marine Mask"
@@ -214,7 +239,7 @@
 	icon_state = "marinemask"
 	item_state = "marinemask"
 	w_class = ITEM_SIZE_SMALL
-	body_parts_covered = HEAD|FACE
+	body_parts_covered = HEAD
 	flags_inv = HIDEEARS|BLOCKHAIR
 
 /obj/item/clothing/suit/space/void/unsc
@@ -303,7 +328,7 @@
 	armor_thickness = 20
 	w_class = ITEM_SIZE_HUGE
 	allowed = list(/obj/item/weapon/gun,/obj/item/ammo_magazine,/obj/item/weapon/tank)
-	armor = list(melee = 55, bullet = 40, laser = 25, energy = 25, bomb = 30, bio = 100, rad = 100)
+	armor = list(melee = 50, bullet = 45, laser = 50, energy = 40, bomb = 35, bio = 20, rad = 20)
 
 /obj/item/clothing/head/helmet/eva/marine
 	name = "\improper EVA Marine Helmet"
@@ -316,7 +341,7 @@
 	item_state = "eva"
 	icon_state = "eva"
 	item_flags = STOPPRESSUREDAMAGE|AIRTIGHT
-	armor = list(melee = 55, bullet = 25, laser = 55,energy = 25, bomb = 15, bio = 100, rad = 50)
+	armor = list(melee = 45, bullet = 25, laser = 45,energy = 15, bomb = 20, bio = 10, rad = 10)
 	max_heat_protection_temperature = FIRE_HELMET_MAX_HEAT_PROTECTION_TEMPERATURE
 
 	action_button_name = "Toggle Helmet Light"
@@ -334,7 +359,7 @@
 	icon_override = MARINE_OVERRIDE
 	item_state = "evalegs"
 	icon_state = "evalegs"
-	item_flags = NOSLIP|STOPPRESSUREDAMAGE|AIRTIGHT
+	item_flags = STOPPRESSUREDAMAGE|AIRTIGHT
 	can_hold_knife = 1
 	armor = list(melee = 45, bullet = 35, laser = 10, energy = 25, bomb = 30, bio = 100, rad = 50)
 	max_heat_protection_temperature = FIRE_HELMET_MAX_HEAT_PROTECTION_TEMPERATURE
@@ -367,7 +392,7 @@
 	item_state = "unsc gloves"
 	icon = ITEM_INHAND
 	icon_override = MARINE_OVERRIDE
-	siemens_coefficient = 0
+	siemens_coefficient = 0.5
 	permeability_coefficient = 0.05
 	item_state_slots = list(slot_l_hand_str = "gloves", slot_r_hand_str = "gloves")
 	body_parts_covered = HANDS

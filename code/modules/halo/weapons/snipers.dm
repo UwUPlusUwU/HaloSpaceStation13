@@ -17,9 +17,10 @@
 	reload_sound = 'code/modules/halo/sounds/Sniper_Reload_New.wav'
 	one_hand_penalty = -1
 	scoped_accuracy = 7
-	accuracy = -5
+	accuracy = -10
 	screen_shake = 0
-	fire_delay = 10
+	dispersion = list(0.1)
+	fire_delay = 12
 	burst = 1
 	wielded_item_state = "SRS99-wielded"
 	w_class = ITEM_SIZE_HUGE
@@ -48,7 +49,6 @@
 	. = ..()
 
 //M392 designated marksman rifle
-//todo: should this be a sniper?
 /obj/item/weapon/gun/projectile/m392_dmr
 	name = "M392 Designated Marksman Rifle"
 	desc = "This rifle favors mid- to long-ranged combat, offering impressive stopping power over a long distance. Has an inbuilt underbarrel flashlight.  Takes 7.62mm calibre magazines."
@@ -64,8 +64,8 @@
 	reload_sound = 'code/modules/halo/sounds/DMR_Reload_New.wav'
 	one_hand_penalty = -1
 	w_class = ITEM_SIZE_LARGE
+	dispersion = list(0.26)
 	accuracy = 2
-	scoped_accuracy = 3
 	var/on = 0
 	var/activation_sound = 'code/modules/halo/sounds/Assault_Rifle_Flashlight.wav'
 
@@ -94,20 +94,13 @@
 	desc = "A heavily modified M392 remade without a bullpup design and including a hardened barrel for a faster fire rate. Has both semi and burst functionality. Takes 7.62mm rounds."
 	fire_sound = 'code/modules/halo/sounds/innieDMRfirfix.ogg'
 	reload_sound = 'code/modules/halo/sounds/InnieDMRreload.ogg'
-	fire_delay = 1.5
-	burst_delay = 1.5
-	burst = 1
+	fire_delay = 7
+	burst_delay = 1
+	burst = 2
 	magazine_type = /obj/item/ammo_magazine/m762_ap/M392/innie
 	allowed_magazines = list(/obj/item/ammo_magazine/m762_ap/M392)
-	accuracy = 1
-	scoped_accuracy = 2
-	dispersion = list(0.2)
-
-	firemodes = list(
-		list(mode_name="2-round bursts", burst=2, fire_delay=3.5, move_delay=6,    burst_accuracy=list(-1,-1),       dispersion=list(0.0, 0.4, 0.4)),
-		list(mode_name="semi-automatic", 	burst=1, fire_delay=1.5, move_delay=6,    burst_accuracy=list(1), dispersion=list(0.0)),
-		)
-
+	accuracy = -1
+	scoped_accuracy = 1
 
 /obj/item/weapon/gun/energy/SDSR_10
 	name = "SDSR-10"
@@ -120,6 +113,7 @@
 	self_recharge = 1
 	recharge_time = 10 //10 seconds recharge time.
 	max_shots = 1
+	dispersion = list(0.26)
 	one_hand_penalty = -1
 	scoped_accuracy = 1
 	accuracy = 0

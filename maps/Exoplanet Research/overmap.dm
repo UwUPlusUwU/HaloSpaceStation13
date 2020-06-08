@@ -10,7 +10,11 @@
 
 	map_bounds = list(1,150,150,1) //Format: (TOP_LEFT_X,TOP_LEFT_Y,BOTTOM_RIGHT_X,BOTTOM_RIGHT_Y)
 
+	overmap_spawn_near_me = list(/obj/effect/overmap/ship/unsclightbrigade)
+
 	parent_area_type = /area/exo_research_facility/sublevel1/interior
+
+	occupy_range = 28
 
 /obj/effect/overmap/sector/exo_research/New()
 	. = ..()
@@ -49,16 +53,11 @@
 	loot_distributor.loot_list["gauntletLoot"] = list(\
 	/obj/item/weapon/reagent_containers/glass/bottle/floodtox,\
 	/obj/item/weapon/reagent_containers/glass/bottle/floodtox,\
-	/obj/structure/xeno_plant,\
 	/obj/structure/autoturret/ONI,\
 	/obj/item/sentinel_kit,\
 	/obj/item/weapon/gun/energy/laser/sentinel_beam/detached,\
 	/obj/item/weapon/gun/energy/laser/sentinel_beam/detached,\
 	null,null,null)
-
-/obj/effect/overmap/sector/exo_research/LateInitialize()
-	. = ..()
-	GLOB.overmap_tiles_uncontrolled -= range(28,src)
 
 /obj/effect/loot_marker/gauntlet_loot
 	loot_type = "gauntletLoot"

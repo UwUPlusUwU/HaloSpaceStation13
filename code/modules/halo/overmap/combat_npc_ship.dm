@@ -85,7 +85,7 @@
 			faction_name = their_faction.name
 		if(isnull(my_faction) || isnull(faction_name))
 			continue
-		if(faction_name in my_faction.enemy_factions)
+		if(faction_name in my_faction.enemy_faction_names)
 			targets += ship
 
 	if(targets.len > 0)
@@ -102,21 +102,18 @@
 
 	if(target)
 		//check if they're in range
-		if(get_dist(src, target) > 14)//Two screen range because it's so easy to run from ships now.
+		if(get_dist(src, target) > 10)//Slightly higher than view range for the sake of pursuit
 			target = null
 		else
 			//open fire
 			fire_at_target()
 
-			if(!target_loc || is_still())
-				//Let's emulate a "circling" behaviour.
-				var/list/target_locs = list()
-				for(var/turf/unsimulated/map/m in view(target_range_from,target))
-					if(istype(m,/turf/unsimulated/map/edge))
-						continue
-					target_locs += m
-				if(target_locs.len > 0)
-					target_loc = pick(target_locs)
+			var/list/target_locs = trange(target_range_from,target)
+			for(var/m in target_locs)
+				if(istype(m,/turf/unsimulated/map/edge))
+					target_locs -= m
+			if(target_locs.len > 0)
+				target_loc = pick(target_locs)
 	else
 		find_target()
 
@@ -143,7 +140,7 @@
 	faction = "UNSC"
 	ship_datums = list(/datum/npc_ship/unsc_patrol)
 	available_ship_requests = newlist(/datum/npc_ship_request/halt/unsc,/datum/npc_ship_request/fire_on_target/unsc,/datum/npc_ship_request/control_fleet/unsc,/datum/npc_ship_request/add_to_fleet/unsc,/datum/npc_ship_request/give_control/unsc)
-	radio_channel = "SHIPCOM"
+	radio_channel = RADIO_FLEET
 
 /obj/effect/overmap/ship/npc_ship/combat/unsc/generate_ship_name()
 	. = ..()
@@ -162,10 +159,7 @@
 	faction = "Insurrection"
 	ship_datums = list(/datum/npc_ship/unsc_patrol)
 	available_ship_requests = newlist(/datum/npc_ship_request/halt_fake,/datum/npc_ship_request/halt/innie,/datum/npc_ship_request/fire_on_target/innie,/datum/npc_ship_request/control_fleet/innie,/datum/npc_ship_request/add_to_fleet/innie,/datum/npc_ship_request/give_control/innie)
-
-/obj/effect/overmap/ship/npc_ship/combat/innie/New()
-	. = ..()
-	radio_channel = halo_frequencies.innie_channel_name
+	radio_channel = RADIO_INNIE
 
 /obj/effect/overmap/ship/npc_ship/combat/innie/generate_ship_name()
 	. = ..()
@@ -180,7 +174,7 @@
 	projectiles_to_fire = list(/obj/item/projectile/overmap/deck_gun_proj = 0.1 SECONDS,/obj/item/projectile/overmap/missile = 1 SECONDS)
 
 /obj/effect/overmap/ship/npc_ship/combat/innie/heavily_armed
-	projectiles_to_fire = list(/obj/item/projectile/overmap/deck_gun_proj = 0.1 SECONDS,/obj/item/projectile/overmap/missile = 0.5 SECONDS, /obj/item/projectile/overmap/mac/npc = 20 SECONDS)
+	projectiles_to_fire = list(/obj/item/projectile/overmap/deck_gun_proj = 0.2 SECONDS,/obj/item/projectile/overmap/missile = 0.5 SECONDS, /obj/item/projectile/overmap/mac/npc = 20 SECONDS)
 
 //COVENANT//
 /obj/effect/overmap/ship/npc_ship/combat/covenant
@@ -216,7 +210,7 @@
 	icons_pickfrom_list = list('code/modules/halo/icons/overmap/kig_missionary.dmi','code/modules/halo/icons/overmap/SDV.dmi')
 	faction = "Covenant"
 	radio_language = "Sangheili"
-	radio_channel = "BattleNet"
+	radio_channel = RADIO_COV
 	ship_datums = list(/datum/npc_ship/cov_patrol)
 	available_ship_requests = newlist(/datum/npc_ship_request/halt/cov,/datum/npc_ship_request/fire_on_target/cov,/datum/npc_ship_request/control_fleet/cov,/datum/npc_ship_request/add_to_fleet/cov,/datum/npc_ship_request/give_control/cov)
 
@@ -224,7 +218,7 @@
 	projectiles_to_fire = list(/obj/item/projectile/overmap/pulse_laser = 0.2 SECONDS,/obj/item/projectile/overmap/plas_torp = 0.5 SECONDS)
 
 /obj/effect/overmap/ship/npc_ship/combat/covenant/heavily_armed
-	projectiles_to_fire = list(/obj/item/projectile/overmap/pulse_laser = 0.2 SECONDS,/obj/item/projectile/overmap/plas_torp = 1 SECONDS, /obj/item/projectile/overmap/beam/npc = 25 SECONDS)
+	projectiles_to_fire = list(/obj/item/projectile/overmap/pulse_laser = 0.1 SECONDS,/obj/item/projectile/overmap/plas_torp = 1 SECONDS, /obj/item/projectile/overmap/beam/npc = 20 SECONDS)
 
 /obj/effect/overmap/ship/npc_ship/combat/flood
 	messages_on_hit = list("... / - -","- / .... / -","..",".","....")

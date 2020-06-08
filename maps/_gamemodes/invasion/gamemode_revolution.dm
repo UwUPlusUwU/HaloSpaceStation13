@@ -5,14 +5,11 @@
 	round_description = "In an outer colony on the edge of human space, a revolution is brewing."
 	extended_round_description = "In an outer colony on the edge of human space, a revolution is brewing."
 	required_players = 0
+	votable = 0
 	end_conditions_required = 1
 	factions = list(/datum/faction/unsc, /datum/faction/insurrection,/datum/faction/human_civ)
-	overmap_hide = list(/obj/effect/overmap/sector/exo_research, /obj/effect/overmap/sector/exo_listen, /obj/effect/overmap/ship/covenant_light_cruiser)
+	overmap_hide = list(/obj/effect/overmap/sector/exo_listen, /obj/effect/overmap/ship/covenant_light_cruiser)
 	disabled_jobs_types = list(\
-		/datum/job/researchdirector,\
-		/datum/job/researcher,\
-		/datum/job/ONIGUARD,\
-		/datum/job/ONIGUARDS,\
 		/datum/job/covenant/huragok,\
 		/datum/job/covenant/AI,\
 		/datum/job/covenant/sangheili_minor,\
@@ -33,19 +30,18 @@
 		/datum/job/covenant/yanmee_major,\
 		/datum/job/covenant/yanmee_ultra,\
 		/datum/job/covenant/yanmee_leader,\
-		/datum/job/ONI_Spartan_II,)
+		/datum/job/unsc/spartan_two)
 
 /datum/game_mode/outer_colonies/revolution/setup_objectives()
 	. = ..()
 
-	var/datum/objective/retrieve/steal_ai/cole_protocol/obj = locate() in GLOB.UNSC.all_objectives
-	obj.fake = 1
+	var/list/fake_objective_types = list(\
+		/datum/objective/retrieve/steal_ai/cole_protocol,\
+		/datum/objective/retrieve/nav_data/cole_protocol,\
+		/datum/objective/overmap/unsc_cov_ship,\
+		/datum/objective/retrieve/artifact/unsc,\
+	)
 
-	var/datum/objective/retrieve/nav_data/cole_protocol/obj2 = locate() in GLOB.UNSC.all_objectives
-	obj2.fake = 1
-
-	var/datum/objective/overmap/unsc_cov_ship/obj3 = locate() in GLOB.UNSC.all_objectives
-	obj3.fake = 1
-
-	var/datum/objective/retrieve/artifact/unsc/obj4 = locate() in GLOB.UNSC.all_objectives
-	obj4.fake = 1
+	for(var/datum/objective/obj in GLOB.UNSC.all_objectives)
+		if(fake_objective_types.Find(obj.type))
+			obj.fake = 1

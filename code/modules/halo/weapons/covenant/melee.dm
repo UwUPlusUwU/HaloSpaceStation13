@@ -1,6 +1,6 @@
 #define ESWORD_LEAP_DIST 2
 #define ESWORD_LEAP_FAR_SPECIES list(/datum/species/sangheili,/datum/species/spartan, /datum/species/kig_yar_skirmisher)
-#define STAFF_LEAP_DIST 7
+#define STAFF_LEAP_DIST 4
 
 /obj/effect/esword_path
 	name = "displaced air"
@@ -13,6 +13,7 @@
 	icon = 'code/modules/halo/icons/Covenant Weapons.dmi'
 	icon_state = "T1EW Handle"
 	var/icon_state_deployed = "T1EW-deployed"
+	var/inhand_icon_state = "Energy sword_inhand Human" // " l" or " r" is added after this to make the variants
 	force = 1
 	throwforce = 1
 	active_force = 75
@@ -68,8 +69,8 @@
 	else
 		item_icons = list(slot_l_hand_str ='code/modules/halo/icons/Energy Sword_inhand Human.dmi',slot_r_hand_str = 'code/modules/halo/icons/Energy Sword_inhand Human.dmi')
 		item_state_slots = list(
-		slot_l_hand_str = "Energy sword_inhand Human l",
-		slot_r_hand_str = "Energy sword_inhand Human r" )
+		slot_l_hand_str = "[inhand_icon_state] l",
+		slot_r_hand_str = "[inhand_icon_state] r" )
 		hitsound = 'code/modules/halo/sounds/Energyswordhit.ogg'
 		parry_slice_objects = 1
 
@@ -99,7 +100,7 @@
 		if(icon_state == icon_state_deployed)
 			if(failsafe)
 				src.visible_message("<span class='warning'>[src] bursts into a superheated flash of plasma!</span>")
-				flick("blade burnout",src)
+				flick("[icon_state_deployed]-burnout",src)
 				spawn(5)
 					var/mob/living/M = src.loc
 					if(istype(M))
@@ -192,50 +193,6 @@
 		damtype = BURN
 		parry_slice_objects = 1
 
-//DONER
-
-//DOGLER
-
-//Dagger
-
-/obj/item/weapon/melee/energy/elite_sword/dagger/dogler
-
-	name = "Sya'tenee's Energy Dagger"
-	icon_state = "dogler_dag_handle"
-	icon_state_deployed = "dogler_dag_deploy"
-
-/obj/item/weapon/melee/energy/elite_sword/dagger/dogler/change_misc_variables(var/deactivate = 0)
-	if(deactivate)
-		item_icons = list(slot_l_hand_str = null,slot_r_hand_str = null)
-		item_state_slots = null
-		hitsound = "swing_hit"
-	else
-		item_icons = list(slot_l_hand_str ='code/modules/halo/icons/dogler_weapon_sprites.dmi',slot_r_hand_str = 'code/modules/halo/icons/dogler_weapon_sprites.dmi')
-		item_state_slots = list(
-		slot_l_hand_str = "dogler_dag_l_hand",
-		slot_r_hand_str = "dogler_dag_r_hand" )
-		hitsound = 'code/modules/halo/sounds/Energyswordhit.ogg'
-
-//Axe
-
-/obj/item/weapon/melee/energy/elite_sword/dogleraxe
-	name = "Sya'tenee's Energy Axe"
-	desc = "A huge, scary-looking energy axe, which looks too heavy to be wielded by humans..."
-	icon = 'code/modules/halo/icons/dogler_weapon_sprites.dmi'
-	force = 65
-	armor_penetration = 35
-	icon_state = "dogler_axe"
-	item_icons = list(slot_l_hand_str ='code/modules/halo/icons/dogler_weapon_sprites.dmi',slot_r_hand_str = 'code/modules/halo/icons/dogler_weapon_sprites.dmi')
-	item_state_slots = list(
-	slot_l_hand_str = "dogler_axe_l1",
-	slot_r_hand_str = "dogler_axe_r1")
-
-/obj/item/weapon/melee/energy/elite_sword/dogleraxe/activate(mob/living/user)
-	return
-
-/obj/item/weapon/melee/energy/elite_sword/dogleraxe/deactivate(mob/living/user)
-	return
-
 /obj/item/weapon/material/shard/shrapnel/blamite
 	name = "Blamite Blade"
 
@@ -250,12 +207,14 @@ Luckily, this isn't a downside due to the explosive properties of such a large a
 	item_icons = list(slot_l_hand_str ='code/modules/halo/weapons/icons/Weapon_Inhands_right.dmi',slot_r_hand_str = 'code/modules/halo/weapons/icons/Weapon_Inhands_right.dmi')
 	w_class = ITEM_SIZE_LARGE
 	slot_flags = SLOT_BACK | SLOT_BELT | SLOT_POCKET
+	edge = 1
+	sharp = 1
 	armor_penetration = 35
 	var/explode_delay = 10 SECONDS
 	var/explode_at = -1
 	var/regen_delay = 2 MINUTES
 	var/regen_at = -1
-	var/explode_damage = 40
+	var/explode_damage = 60
 
 /obj/item/weapon/melee/blamite/update_icon()
 	if(regen_at != -1)

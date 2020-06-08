@@ -35,7 +35,7 @@
 	if(beaker)
 		beaker.forceMove(get_step(loc, SOUTH)) //Beaker is carefully ejected from the wreckage of the cryotube
 		beaker = null
-	..()
+	. = ..()
 
 /obj/machinery/atmospherics/unary/cryo_cell/atmos_init()
 	..()
@@ -362,7 +362,7 @@
 	return air_contents
 
 //This proc literally only exists for cryo cells.
-/atom/proc/return_air_for_internal_lifeform()
+/atom/proc/return_air_for_internal_lifeform(var/mob/lifeform)
 	return return_air()
 
 /obj/machinery/atmospherics/unary/cryo_cell/return_air_for_internal_lifeform()

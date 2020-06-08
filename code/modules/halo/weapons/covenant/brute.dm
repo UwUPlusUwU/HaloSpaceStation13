@@ -6,10 +6,10 @@
 /obj/item/weapon/grenade/frag/spike
 	name = "spike grenade"
 	desc = "This device embeds itself into soft targets and explodes into a hail of deadly shards. Works well as a melee weapon."
-	icon = 'code/modules/halo/icons/species/jiralhanae_obj.dmi'
+	icon = 'code/modules/halo/weapons/icons/jiralhanae_obj.dmi'
 	icon_state = "spikegren0"
-	icon_override = 'code/modules/halo/icons/species/jiralhanae_gear.dmi'
-	item_state = "blank"
+	icon_override = 'code/modules/halo/weapons/icons/jiralhanae_gear.dmi'
+	item_state = "spikegren1"
 	item_state_slots = list(slot_l_hand_str = "spnade", slot_r_hand_str = "spnade")
 
 	force = 35
@@ -36,7 +36,7 @@
 /obj/item/weapon/grenade/frag/spike/throw_at(atom/target, range, speed, thrower)
 	icon_state = "spikegren_spin"
 	. = ..()
-	icon_state = "spikegren[active]"
+	icon_state = "spikegren1"
 
 
 
@@ -47,8 +47,8 @@
 /obj/item/weapon/gun/projectile/spiker
 	name = "Type-25 Spiker Carbine"
 	desc = "A sidearm with two wicked blades curving out from under the barrel."
-	icon = 'code/modules/halo/icons/species/jiralhanae_obj.dmi'
-	icon_override = 'code/modules/halo/icons/species/jiralhanae_gear.dmi'
+	icon = 'code/modules/halo/weapons/icons/jiralhanae_obj.dmi'
+	icon_override = 'code/modules/halo/weapons/icons/jiralhanae_gear.dmi'
 	icon_state = "spiker"
 	item_state = "blank"
 	slot_flags = SLOT_BACK | SLOT_BELT
@@ -66,17 +66,25 @@
 	is_heavy = 1
 	armor_penetration = 35
 	accuracy = -1
+	dispersion = list(0.2,0.3,0.5)
 	//reload_sound = 'code/modules/halo/sounds/Spikershotfire.ogg'
 	item_state_slots = list(slot_l_hand_str = "spiker", slot_r_hand_str = "spiker")
-	lunge_dist = 5
+	lunge_dist = 3
+
+/obj/item/weapon/gun/projectile/spiker/update_icon()
+	if(ammo_magazine)
+		icon_state = "spiker"
+	else
+		icon_state = "spiker_unloaded"
+	. = ..()
 
 /obj/item/weapon/gun/projectile/spiker/can_embed()
 	return 0
 
 /obj/item/ammo_magazine/spiker
 	name = "spiker magazine"
-	desc = "A 20 round magazine for the Jiralhanae spiker"
-	icon = 'code/modules/halo/icons/species/jiralhanae_obj.dmi'
+	desc = "A 30 round magazine for the Jiralhanae spiker"
+	icon = 'code/modules/halo/weapons/icons/jiralhanae_obj.dmi'
 	icon_state = "spiker_mag"
 	item_state = "blank"
 	mag_type = MAGAZINE
@@ -113,8 +121,8 @@
 /obj/item/weapon/gun/projectile/mauler
 	name = "Type-52 \"Mauler\""
 	desc = "A single shot, short range Jiralhanae sidearm with a powerful punch. Has a blade underneath."
-	icon = 'code/modules/halo/icons/species/jiralhanae_obj.dmi'
-	icon_override = 'code/modules/halo/icons/species/jiralhanae_gear.dmi'
+	icon = 'code/modules/halo/weapons/icons/jiralhanae_obj.dmi'
+	icon_override = 'code/modules/halo/weapons/icons/jiralhanae_gear.dmi'
 	icon_state = "mauler"
 	item_state = "blank"
 	slot_flags = SLOT_BACK | SLOT_BELT
@@ -123,15 +131,24 @@
 	load_method = MAGAZINE
 	caliber = "mauler"
 	origin_tech = list(TECH_COMBAT = 2, TECH_MATERIAL = 2)
+	fire_sound = 'code/modules/halo/sounds/mauler_firing.ogg'
 	edge = 1
 	sharp = 1
 	force = 40
 	is_heavy = 1
 	armor_penetration = 35
 	accuracy = -1
+	dispersion = list(0.45)
 	w_class = ITEM_SIZE_NORMAL
 	item_state_slots = list(slot_l_hand_str = "mauler", slot_r_hand_str = "mauler")
-	lunge_dist = 5
+	lunge_dist = 3
+
+/obj/item/weapon/gun/projectile/mauler/update_icon()
+	if(ammo_magazine)
+		icon_state = "mauler"
+	else
+		icon_state = "mauler_unloaded"
+	. = ..()
 
 /obj/item/weapon/gun/projectile/mauler/can_embed()
 	return 0
@@ -139,7 +156,7 @@
 /obj/item/ammo_magazine/mauler
 	name = "mauler magazine"
 	desc = "A 5 round magazine for the Jiralhanae mauler"
-	icon = 'code/modules/halo/icons/species/jiralhanae_obj.dmi'
+	icon = 'code/modules/halo/weapons/icons/jiralhanae_obj.dmi'
 	icon_state = "mauler_mag"
 	mag_type = MAGAZINE
 	ammo_type = /obj/item/ammo_casing/mauler
@@ -155,7 +172,6 @@
 /*
 /obj/item/projectile/bullet/mauler
 	damage = 75
-
 /obj/item/projectile/bullet/mauler/attack_mob(var/mob/living/target_mob, var/distance, var/miss_modifier=0)
 	. = ..()
 	if(.)
@@ -169,8 +185,8 @@
 /obj/item/weapon/grav_hammer
 	name = "Type-2 Energy Weapon/Hammer"
 	desc = "A long haft and a heavy head with a tungsten-alloy blade on the reverse end. Within the head is a short-range shock-field-generating gravity drive for extra punch."
-	icon = 'code/modules/halo/icons/species/jiralhanae_obj_large.dmi'
-	icon_override = 'code/modules/halo/icons/species/jiralhanae_gear.dmi'
+	icon = 'code/modules/halo/covenant/species/jiralhanae/jiralhanae_obj_heavy.dmi'
+	icon_override = 'code/modules/halo/covenant/species/jiralhanae/jiralhanae_gear.dmi'
 	icon_state = "gravhammer"
 	item_state = "blank"
 	w_class = ITEM_SIZE_HUGE
@@ -212,8 +228,8 @@
 /obj/item/weapon/gun/launcher/grenade/brute_shot
 	name = "Type-25 \"Brute Shot\" Grenade Launcher"
 	desc = "A hip fired fast firing launcher for HE munitions with a curved backwards facing blade mounted to its underside."
-	icon = 'code/modules/halo/icons/species/jiralhanae_obj_large.dmi'
-	icon_override = 'code/modules/halo/icons/species/jiralhanae_gear.dmi'
+	icon = 'code/modules/halo/covenant/species/jiralhanae/jiralhanae_obj_heavy.dmi'
+	icon_override = 'code/modules/halo/covenant/species/jiralhanae/jiralhanae_gear.dmi'
 	icon_state = "bruteshot"
 	item_state = "blank"
 	pump_sound = null
@@ -275,7 +291,7 @@
 /obj/item/weapon/grenade/brute_shot
 	name = "belt of type-25 antipersonnel grenades"
 	desc = "A small explosive device designed to be propelled out of the type-25 grenade launcher. Can also be thrown manually."
-	icon = 'code/modules/halo/icons/species/jiralhanae_obj.dmi'
+	icon = 'code/modules/halo/weapons/icons/jiralhanae_obj.dmi'
 	icon_state = "bruteshot_belt"
 	var/fire_sound = null
 	det_time = 50
@@ -360,7 +376,7 @@
 	while(grensleft > 0)
 
 		//create an image of a grenade and tweak it a bit
-		var/image/gren = image('code/modules/halo/icons/species/jiralhanae_obj.dmi', "bruteshot_gren")
+		var/image/gren = image('code/modules/halo/weapons/icons/jiralhanae_obj.dmi', "bruteshot_gren")
 		var/matrix/M = matrix()
 		M.Translate(rand(-8, 8), rand(-8, 8))
 		M.Turn(pick(0,45))

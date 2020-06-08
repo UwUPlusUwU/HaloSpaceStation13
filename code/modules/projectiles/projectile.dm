@@ -1,3 +1,5 @@
+#define SUPPRESSION_GRACE_STEPS 2//How many steps can a bullet make before it actually starts suppressing people.
+
 /obj/item/projectile
 	name = "projectile"
 	icon = 'icons/obj/projectiles.dmi'
@@ -32,6 +34,7 @@
 	var/check_armour = "bullet" //Defines what armor to use when it hits things.  Must be set to bullet, laser, energy,or bomb	//Cael - bio and rad are also valid
 	var/projectile_type = /obj/item/projectile
 	var/penetrating = 0 //If greater than zero, the projectile will pass through dense objects as specified by on_penetrate(). If 999, always penetrates.
+	var/shield_damage = 0 //Damage applied soley to shields. If this damage alone breaks a shield, the projectile will not encounter the usual shield gating.
 	var/kill_count = 50 //This will de-increment every process(). When 0, it will delete the projectile.
 		//Effects
 	var/stun = 0
@@ -131,8 +134,8 @@
 		return 1
 
 	if(targloc == curloc) //Shooting something in the same turf
-		target.bullet_act(src, target_zone)
-		on_impact(target)
+		if(target.bullet_act(src, target_zone) > 0)
+			on_impact(target)
 		qdel(src)
 		return 0
 
@@ -182,7 +185,7 @@
 		return
 
 	//roll to-hit
-	miss_modifier = max(15*(distance-2) - round(15*accuracy) + miss_modifier, 0)
+	miss_modifier = max(PROJECTILE_MISS_CHANCE_PERTILE*(distance-PROJECTILE_MISS_CHANCE_DIST_REDUCTION) - round(PROJECTILE_MISS_CHANCE_PERTILE*accuracy) + miss_modifier, 0)
 	var/hit_zone = get_zone_with_miss_chance(def_zone, target_mob, miss_modifier, ranged_attack=(distance > 1 || original != target_mob)) //if the projectile hits a target we weren't originally aiming at then retain the chance to miss
 
 	var/result = PROJECTILE_FORCE_MISS
@@ -192,10 +195,16 @@
 
 	if(result == PROJECTILE_FORCE_MISS)
 		if(!silenced)
-			target_mob.visible_message("<span class='notice'>\The [src] misses [target_mob] narrowly!</span>")
+			to_chat(target_mob,"<span class='notice'>\The [src] misses you narrowly!</span>")
 		return 0
 
+	if(result == PROJECTILE_ABSORB)
+		return 1
+
 	//hit messages
+	if(isnull(target_mob))
+		return 0
+
 	var/mob_target_zone = target_mob.get_equivalent_body_part(def_zone)
 	mob_target_zone = parse_zone(mob_target_zone)
 	if(silenced)
@@ -226,11 +235,12 @@
 
 	return 1
 
-/obj/item/projectile/proc/do_supression_aoe(var/location)
+/obj/item/projectile/proc/do_suppression_aoe(var/location)
 	for(var/mob/living/carbon/human/h in orange(1,location))
 		if(h in permutated)
 			continue
-		h.supression_act(src)
+		spawn()
+			h.suppression_act(src)
 
 /obj/item/projectile/Bump(atom/A as mob|obj|turf|area, forced=0)
 	if(A == src)
@@ -308,8 +318,10 @@
 
 /obj/item/projectile/process()
 	var/first_step = 1
-
 	spawn while(src && src.loc)
+		if(kill_count < initial(kill_count) - SUPPRESSION_GRACE_STEPS)
+			do_suppression_aoe(loc)
+
 		if(kill_count-- < 1)
 			on_impact(src.loc) //for any final impact behaviours
 			qdel(src)
@@ -340,10 +352,6 @@
 
 		before_move()
 		Move(location.return_turf())
-
-		if(first_step != 1)
-			spawn()
-				do_supression_aoe(loc)
 
 		if(!bumped && original && !isturf(original))
 			if(loc == get_turf(original))

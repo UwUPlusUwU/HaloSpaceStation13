@@ -4,7 +4,6 @@
 
 	icon = 'code/modules/halo/vehicles/types/spirit.dmi'
 	icon_state = "base"
-	vehicle_move_delay = 1.2
 	faction = "covenant"
 	density = 1
 
@@ -16,6 +15,7 @@
 
 	takeoff_overlay_icon_state = "thrust"
 	takeoff_sound = null
+	overmap_range = 10
 
 	comp_prof = /datum/component_profile/spirit
 
@@ -29,6 +29,13 @@
 
 	light_color = "#C1CEFF"
 	spawn_datum = /datum/mobile_spawn/covenant
+
+	min_speed = 17.25
+	max_speed = 2.25
+	acceleration = 6
+	drag = 3.5
+
+	internal_air = new
 
 /obj/vehicles/air/overmap/spirit_dropship/update_object_sprites()
 	. = ..()
@@ -53,7 +60,6 @@
 	desc = "A cannon that fires large bolts of plasma"
 
 	fire_sound = 'code/modules/halo/sounds/spirit_firesound.ogg'
-	projectile_fired = /obj/item/projectile/bullet/covenant/spirit_cannon
 
 	fire_delay = 2 SECONDS
 
@@ -61,8 +67,20 @@
 
 	irradiate_non_cov = 12
 
+	magazine_type = /obj/item/ammo_magazine/spirit_cannon
+
+/obj/item/ammo_magazine/spirit_cannon
+	max_ammo = 100
+	caliber = "spiritPlas"
+	ammo_type = /obj/item/ammo_casing/spirit_cannon
+
+/obj/item/ammo_casing/spirit_cannon
+	name = "Internal Plasma Storage"
+	caliber = "spiritPlas"
+	projectile_type = /obj/item/projectile/bullet/covenant/spirit_cannon
+
 /obj/item/projectile/bullet/covenant/spirit_cannon
-	damage = 25
+	damage = 50
 	icon = 'code/modules/halo/icons/Covenant_Projectiles.dmi'
 	icon_state = "heavy_plas_cannon"
 

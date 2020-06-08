@@ -12,6 +12,8 @@
 
 	comp_prof = /datum/component_profile/bull
 
+	ammo_containers = newlist(/obj/item/ammo_magazine/warthog_mag)
+
 	vehicle_move_delay = 1.75
 
 	occupants = list(4,1)
@@ -23,6 +25,9 @@
 	move_sound = 'code/modules/halo/sounds/warthog_move.ogg'
 
 	light_color = "#FEFFE1"
+
+	min_speed = 8.75
+	max_speed = 2.75
 
 /obj/vehicles/bull/update_object_sprites()
 	. = ..()
@@ -36,7 +41,7 @@
 
 /obj/item/vehicle_component/health_manager/bull
 	integrity = 500
-	resistances = list("brute"=50,"burn"=45,"emp"=30,"bomb"=30)
+	resistances = list("brute"=80,"burn"=80,"emp"=30,"bomb"=50)
 
 /datum/component_profile/bull
 	pos_to_check = "gunner"

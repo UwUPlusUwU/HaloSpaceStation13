@@ -2,7 +2,7 @@
 	name = "UNSC Light Brigade"
 	desc = "Halberd Class Destroyer."
 
-	icon = 'Halberdclass.dmi'
+	icon = 'halberdclass_new.dmi'
 	icon_state = "ship"
 	fore_dir = WEST
 	vessel_mass = 4
@@ -13,7 +13,7 @@
 
 	parent_area_type = /area/destroyer/unsclightbrigade
 
-	ship_max_speed = 2
+	ship_max_speed = SHIP_DEFAULT_PIXEL_SPEED - 1
 
-/obj/machinery/button/toggle/alarm_button/destroyer
+/obj/machinery/button/toggle/alarm_button/light_brigade
 	area_base = /area/destroyer/unsclightbrigade

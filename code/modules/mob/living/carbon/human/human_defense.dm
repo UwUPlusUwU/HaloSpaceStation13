@@ -20,23 +20,25 @@ cloak disrupt override
 	var/shield_check = check_shields(P.damage, P, null, def_zone, "the [P.name]")
 	if(shield_check)
 		if(shield_check < 0)
-			return shield_check
+			return PROJECTILE_ABSORB
 		else
 			P.on_hit(src, 100, def_zone)
 			return 100
+
+
+
+	var/blocked = ..(P, def_zone)
 
 	//Shrapnel
 	if(!(species.flags & NO_EMBED) && P.can_embed())
 		var/obj/item/organ/external/organ = get_organ(def_zone)
 		var/armor = getarmor_organ(organ, "bullet")
-		if(prob(20 + max(P.damage - armor, -10)))
+		if(prob(20 + max((P.damage*blocked_mult(blocked)) - armor, -20)))
 			var/obj/item/weapon/material/shard/shrapnel/SP = new()
 			SP.name = (P.name != "shrapnel")? "[P.name] shrapnel" : "shrapnel"
 			SP.desc = "[SP.desc] It looks like it was fired from [P.shot_from]."
 			SP.loc = organ
 			organ.embed(SP)
-
-	var/blocked = ..(P, def_zone)
 
 	projectile_hit_bloody(P, P.damage*blocked_mult(blocked), def_zone)
 
@@ -485,12 +487,11 @@ cloak disrupt override
 
 	return perm
 
-/mob/living/carbon/human/proc/supression_act(var/obj/item/projectile/P)
+/mob/living/carbon/human/proc/suppression_act(var/obj/item/projectile/P)
 	if(!client)
 		return
-	var/seconds_since_supression = (world.time - time_last_supressed)/10
-	if(seconds_since_supression <= 1)
-		shake_camera(src,2,1)
+	var/seconds_since_supression = (world.time - time_last_suppressed)/10
+	if(seconds_since_supression <= 2)
 		overlay_fullscreen("supress",/obj/screen/fullscreen/oxy, 6)
 		//severe supression effects
 	else if(seconds_since_supression <=5)
@@ -499,12 +500,9 @@ cloak disrupt override
 	else if(seconds_since_supression <=10)
 		overlay_fullscreen("supress",/obj/screen/fullscreen/oxy, 4)
 		//low supression effects
-	else if(seconds_since_supression > 10)
-		if(prob(40))
-			visible_message("<span class = 'danger'>The [P.name] whizzes past [src]!</span>")
 	if(prob(SUPRESSION_SCREAM_CHANCE))
 		emote("painscream",AUDIBLE_MESSAGE)
-	time_last_supressed = world.time
+	time_last_suppressed = world.time
 
 /mob/living/carbon/human/attack_generic(var/mob/user, var/damage, var/attack_message,environment_smash)
 	if(!damage || !istype(user))

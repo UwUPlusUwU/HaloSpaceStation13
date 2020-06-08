@@ -42,6 +42,7 @@
 				on_call = 1
 			else
 				ship_source.target_loc = null
+
 			if(time_leave_at != 0 && !already_warned && world.time > time_leave_at-warn_depart_time)
 				ship_source.radio_message("I'll be leaving in [warn_depart_time/600] minutes. Better pack your stuff up.")
 				already_warned = 1
@@ -283,7 +284,7 @@
 		if(repairs_until_loc_transmit > 0)
 			repairs_until_loc_transmit--
 		else
-			GLOB.global_headset.autosay("Previously unlogged object located at [ship_source.x],[ship_source.y]", "System Scan", "EBAND", transmit_lang)
+			GLOB.global_announcer.autosay("Previously unlogged object located at [ship_source.x],[ship_source.y]", "System Scan", "EBAND", transmit_lang)
 
 /datum/npc_ship_request/shipyard_repair/insecure/cov
 	request_auth_levels = list(AUTHORITY_LEVEL_COV)

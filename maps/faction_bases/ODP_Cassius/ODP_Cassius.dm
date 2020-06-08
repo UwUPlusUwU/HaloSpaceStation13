@@ -3,6 +3,7 @@
 
 #include "areas.dm"
 #include "ai_items.dm"
+#include "presets.dm"
 #include "ODP_Cassius_1.dmm"
 #include "ODP_Cassius_2.dmm"
 
@@ -12,7 +13,7 @@
 	icon = 'code/modules/halo/icons/overmap/faction_misc.dmi'
 	icon_state = "SMAC"
 	faction = "UNSC"
-	overmap_spawn_near_me = list(/obj/effect/overmap/ship/unsclightbrigade)
+	overmap_spawn_near_me = list(/obj/effect/overmap/sector/geminus_city)
 	base = 1
 	block_slipspace = 1
 	fore_dir = WEST
@@ -22,6 +23,10 @@
 
 	map_bounds = list(23,106,140,32) //Format: (TOP_LEFT_X,TOP_LEFT_Y,BOTTOM_RIGHT_X,BOTTOM_RIGHT_Y)
 
-/obj/effect/overmap/ship/unsc_odp_cassius/Initialize()
+	occupy_range = 7
+
+/obj/effect/overmap/ship/unsc_odp_cassius/Destroy()
+	var/datum/game_mode/outer_colonies/gm = ticker.mode
+	if(istype(gm))
+		gm.allow_scan = 1
 	. = ..()
-	GLOB.overmap_tiles_uncontrolled -= range(7,src)

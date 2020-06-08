@@ -11,14 +11,10 @@
 		'sound/effects/wind/wind_5_1.ogg'\
 		)
 	base_turf = /turf/simulated/floor/asteroid/planet
-	dynamic_lighting = 0
-	luminosity = 1
 	requires_power = 0
 
 /area/planet/stranded_outpost
 	name = "Stranded Outpost"
 	icon_state = "security"
 	base_turf = /turf/simulated/floor/asteroid/planet
-	dynamic_lighting = 0
-	luminosity = 1
 	requires_power = 0

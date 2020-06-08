@@ -12,10 +12,8 @@
 
 	comp_prof = /datum/component_profile/mongoose
 
-	vehicle_move_delay = 1
-
 	occupants = list(1,0)
-	exposed_positions = list("driver" = 10,"passenger" = 25)
+	exposed_positions = list("driver" = 40,"passenger" = 40)
 
 	sprite_offsets = list("1" = list(0,3),"2" = list(0,3),"4" = list(0,3),"8" = list(0,3))
 
@@ -23,9 +21,12 @@
 
 	light_color = "#E1FDFF"
 
+	min_speed = 6
+	max_speed = 2
+
 /obj/vehicles/mongoose/update_object_sprites()
-	. = ..()
-	update_occupant_weight()
+	underlays.Cut()
+	overlays.Cut()
 	var/list/offsets_to_use = sprite_offsets["[dir]"]
 	var/list/drivers = get_occupants_in_position("driver")
 	if(!(isnull(offsets_to_use) || isnull(drivers) || drivers.len == 0))
@@ -50,24 +51,11 @@
 		else
 			overlays += pass_img
 
-/obj/vehicles/mongoose/proc/update_occupant_weight()
-	var/slowdown_amount = 0
-	for(var/mob/living/carbon/human/occupant in occupants)
-	//Ripped from human_movement.dm
-		for(var/slot = slot_first to slot_last)
-			var/obj/item/I = occupant.get_equipped_item(slot)
-			if(I)
-				if(I.slowdown_general > 0)
-					slowdown_amount += I.slowdown_general
-				if(I.slowdown_per_slot[slot] > 0)
-					slowdown_amount += I.slowdown_per_slot[slot]
-	vehicle_move_delay = initial(vehicle_move_delay) + slowdown_amount
-
 #undef MONGOOSE_BASE_PASSENGER_OFFSETS
 //Mongoose component profile define//
 /obj/item/vehicle_component/health_manager/mongoose
-	integrity = 250
-	resistances = list("brute"=30,"burn"=25,"emp"=15)
+	integrity = 300
+	resistances = list("brute"=85,"burn"=85,"emp"=15,"bomb" = 0)
 
 /datum/component_profile/mongoose
 	vital_components = newlist(/obj/item/vehicle_component/health_manager/mongoose)

@@ -62,13 +62,18 @@
 
 	return newimage
 
-/obj/item/weapon/gun/dual_wield_placeholder/afterattack(atom/target, mob/living/user, adjacent, params)
+/obj/item/weapon/gun/dual_wield_placeholder/Fire(atom/target, mob/living/user, clickparams, pointblank=0, reflex=0)
+	var/held_twohanded = (user.can_wield_item(src) && src.is_held_twohanded(user))
+	if(one_hand_penalty == -1)
+		if(!held_twohanded)
+			to_chat(user,"<span class = 'notice'>You can't fire dual-wielded weapons with an occupied offhand!</span>")
+			return
 	next_fire_time = world.time + fire_delay
 	for(var/obj/item/weapon/gun/weapon in weapons_wielded)
 		var/index = weapons_wielded.Find(weapon)
-		spawn((weapon.fire_delay/2) * index)
-			weapon.next_fire_time = 0
-			weapon.afterattack(target, user, adjacent, params)
+		sleep((weapon.fire_delay) * index)
+		weapon.next_fire_time = 0
+		weapon.afterattack(target, user, pointblank, clickparams)
 
 /obj/item/weapon/gun/dual_wield_placeholder/update_twohanding() //Overriden to do nothing so the name doesn't get reset to "dual wield placeholder"
 	return

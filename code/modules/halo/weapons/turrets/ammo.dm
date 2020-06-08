@@ -21,7 +21,7 @@
 	projectile_type = /obj/item/projectile/bullet/hmg127_he
 
 /obj/item/projectile/bullet/hmg127_he
-	damage = 70
+	damage = 50
 
 //CHAINGUN AMMO DEFINES//
 /obj/item/ammo_magazine/chaingun_boxmag
@@ -52,7 +52,7 @@
 	mag_type = MAGAZINE
 
 
-	max_ammo = 100
+	max_ammo = 175
 	multiple_sprites = 1
 
 /obj/item/ammo_casing/plasturret

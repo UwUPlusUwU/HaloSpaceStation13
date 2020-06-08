@@ -323,6 +323,11 @@
 	var/datum/transaction/T = new(target, "Purchase of [currently_vending.item_name]", currently_vending.price, name)
 	vendor_account.do_transaction(T)
 
+/obj/machinery/vending/allowed(var/mob/m)
+	if(emagged || !scan_id)
+		return 1
+	. = ..()
+
 /obj/machinery/vending/attack_ai(mob/user as mob)
 	return attack_hand(user)
 
@@ -335,7 +340,10 @@
 			return
 
 	wires.Interact(user)
-	ui_interact(user)
+	if((!allowed(usr)) && !emagged && scan_id)	//For SECURE VENDING MACHINES YEAH
+		to_chat(usr, "<span class='warning'>Access denied.</span>")//Unless emagged of course
+	else
+		ui_interact(user)
 
 /**
  *  Display the NanoUI window for the vending machine.
@@ -407,7 +415,7 @@
 
 	if ((usr.contents.Find(src) || ((in_range(src, usr) || istype(usr,/mob/living/silicon/ai)) && istype(src.loc, /turf))))
 		if ((href_list["vend"]) && (src.vend_ready) && (!currently_vending))
-			if((!allowed(usr)) && !emagged && scan_id)	//For SECURE VENDING MACHINES YEAH
+			if((!allowed(usr)))	//For SECURE VENDING MACHINES YEAH
 				to_chat(usr, "<span class='warning'>Access denied.</span>")//Unless emagged of course
 				flick(icon_deny,src)
 				return

@@ -45,7 +45,7 @@
 	var/slowdown_per_slot[slot_last] // How much clothing is slowing you down. Negative values speeds you up. This is an associative list: item slot - slowdown
 	var/canremove = 1 //Mostly for Ninja code at this point but basically will not allow the item to be removed if set to 0. /N
 	var/list/armor = list(melee = 0, bullet = 0, laser = 0,energy = 0, bomb = 0, bio = 0, rad = 0) //This is the lower bound for armor values. Take this and multiply by (armor thickness /10)+1 for effective max values.
-	var/armor_thickness //The thickness of the armor, in mm. Keep null to opt-out usage of system for item. This value, set at compile time is the maximum value of thickness for this item. Armor can only lose 10% of this value per-hit.
+	var/armor_thickness = 20 //The thickness of the armor, in mm. Keep null to opt-out usage of system for item. This value, set at compile time is the maximum value of thickness for this item. Armor can only lose 10% of this value per-hit.
 	var/list/armor_thickness_modifiers = list()//A list containing the weaknesses of the armor, used when performing armor-thickness depletion. Format: damage_type - multiplier
 	var/list/allowed = null //suit storage stuff.
 	var/max_suitstore_w_class = ITEM_SIZE_LARGE //suitstore stuff
@@ -108,7 +108,7 @@
 
 /obj/item/afterattack(var/atom/target,var/mob/user)
 	. = ..()
-	if(lunge_dist == 0 || user.loc.Adjacent(target) || istype(loc,/obj/vehicles))
+	if(get_lunge_dist(user) == 0 || user.loc.Adjacent(target) || istype(user.loc,/obj/vehicles))
 		return
 	if(world.time < next_leapwhen)
 		to_chat(user,"<span class = 'notice'>You're still recovering from the last lunge!</span>")
@@ -134,6 +134,7 @@
 		user.visible_message("<span class = 'danger'>[user] lunges forward, [src] in hand, ready to strike!</span>")
 		var/image/user_image = image(user)
 		user_image.dir = user.dir
+		var/do_post_stun = 0
 		for(var/i = 0 to get_dist(user,target))
 			var/obj/after_image = new /obj/effect/esword_path
 			if(i == 0)
@@ -146,8 +147,12 @@
 			after_image.overlays += user_image
 			spawn(5)
 				qdel(after_image)
+			if(i > get_lunge_dist(user)/2)
+				do_post_stun = 1
 		if(user.Adjacent(target) && ismob(target))
 			attack(target,user)
+		if(do_post_stun)
+			user.Stun(2)
 		next_leapwhen = world.time + lunge_delay
 
 /obj/item/device
@@ -749,8 +754,8 @@ modules/mob/living/carbon/human/life.dm if you die, you will be zoomed out.
 			mob_state = "[mob_state]_l"
 		if(slot == slot_r_ear)
 			mob_state = "[mob_state]_r"
-
 		mob_icon = sprite_sheets[bodytype]
+
 	else if(item_icons && item_icons[slot])
 		mob_icon = item_icons[slot]
 	else
@@ -761,12 +766,10 @@ modules/mob/living/carbon/human/life.dm if you die, you will be zoomed out.
 #define ARMOR_DAMAGED 0
 
 /obj/item/proc/degrade_armor_thickness(var/damage,var/damage_type)
-	damage /= 10 //The lower the thickness of the armor, the harder it gets to damage it further. Divided by 10 to keep loss-per-shot sane.
+	damage /= 10
 	var/thickness_dam_cap = ARMOUR_THICKNESS_DAMAGE_CAP
 	if(damage_type in armor_thickness_modifiers)
 		thickness_dam_cap /= armor_thickness_modifiers[damage_type]
-	if(damage > thickness_dam_cap)
-		damage = thickness_dam_cap
 	var/new_thickness = (armor_thickness - min(damage,thickness_dam_cap))
 	if(new_thickness < 0)
 		armor_thickness = 0

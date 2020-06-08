@@ -15,11 +15,14 @@
 	var/obj/effect/overmap/base
 	var/archived_base_name = "NA_BASE_NAME"
 	var/archived_flagship_name = "NA_FLAGSHIP_NAME"
+	var/list/enemy_faction_names = list()
 	var/list/enemy_factions = list()
 	var/list/angry_factions = list()
-	var/list/active_quests = list()
-	var/list/accepted_quests = list()
-	var/list/completed_quests = list()
+
+	var/list/all_quests = list()
+	var/list/available_quests = list()
+	var/list/processing_quests = list()
+
 	var/datum/job/commander_job		//this needs to be set in the gamemode code
 	var/commander_titles = list()	//checks in order of priority for objective purposes
 	var/has_flagship = 0
@@ -29,6 +32,8 @@
 	var/destroyed_reason = null
 	var/list/ship_types = list()
 	var/list/npc_ships = list()
+	var/list/player_ships = list()
+	var/list/all_ships = list()
 	var/list/faction_reputation = list()
 	var/leader_name
 	var/datum/computer_file/data/com/faction_contact_data
@@ -39,6 +44,10 @@
 	var/quest_interval_min = 1 SECONDS
 	var/quest_interval_max = 5 MINUTES
 	var/gear_supply_type
+	var/default_radio_channel = RADIO_HUMAN
+	var/default_language = LANGUAGE_GALCOM
+
+	var/list/listening_programs = list()
 
 /datum/faction/New()
 	. = ..()
@@ -56,6 +65,8 @@
 	faction_contact_data = new()
 	faction_contact_data.generate_data(src)
 
+	setup_announcement()
+
 	//leader name
 	if(prob(50))
 		leader_name = capitalize(pick(GLOB.first_names_female)) + " " + capitalize(pick(GLOB.last_names))
@@ -63,6 +74,10 @@
 		leader_name = capitalize(pick(GLOB.first_names_male)) + " " + capitalize(pick(GLOB.last_names))
 
 /datum/faction/proc/Initialize()
+	for(var/faction_name in enemy_faction_names)
+		var/datum/faction/F = GLOB.factions_by_name[faction_name]
+		if(F)
+			enemy_factions.Add(F)
 
 /datum/faction/proc/add_faction_reputation(var/faction_name, var/new_rep)
 	if(!faction_reputation.Find(faction_name))
@@ -91,6 +106,17 @@
 	return 0
 
 /datum/faction/proc/players_alive()
+	//loop over and check if our playerlist is up to date
+	for(var/index=1, index <= living_minds.len, index++)
+		var/datum/mind/M = living_minds[index]
+
+		if(!M || !M.current || !isliving(M.current) || M.current.stat == DEAD)
+			//remove this entry
+			living_minds.Cut(index, index + 1)
+
+			//the order has shifted so make sure we test every entry
+			index -= 1
+
 	return living_minds.len
 
 /datum/faction/proc/get_flagship()

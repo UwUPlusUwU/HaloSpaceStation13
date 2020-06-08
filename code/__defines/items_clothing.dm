@@ -1,6 +1,6 @@
 #define HUMAN_STRIP_DELAY        40   // Takes 40ds = 4s to strip someone.
 
-#define BACKPACK_SLOWDOWN_MOD 0.03 //The modifer to apply to the w_class of an item when calculating slowdown.
+#define BACKPACK_SLOWDOWN_MOD 0.05 //The modifer to apply to the w_class of an item when calculating slowdown.
 
 #define SHOES_SLOWDOWN         -1.0  // How much shoes slow you down by default. Negative values speed you up.
 
@@ -46,6 +46,9 @@
 #define PHORONGUARD        0x20  // Does not get contaminated by phoron.
 #define	NOREACT            0x40  // Reagents don't react inside this container.
 #define PROXMOVE           0x80  // Does this object require proximity checking in Enter()?
+
+#define OBJ_ANCHORABLE 0x100
+#define OBJ_CLIMBABLE 0x200
 
 //Flags for items (equipment)
 #define THICKMATERIAL          0x1  // Prevents syringes, parapens and hyposprays if equiped to slot_suit or slot_head.

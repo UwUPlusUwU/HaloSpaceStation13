@@ -74,13 +74,13 @@
 	var/respawn_timer = 3 MINUTES
 	var/turf/spawn_turf
 
-	//Simple Command Stuff//
-	var/mob/leader_follow
-	var/hold_fire = FALSE
+	var/parry_slice_objects = 0
 
 /mob/living/simple_animal/New()
 	. = ..()
 	spawn_turf = get_turf(src)
+	apply_difficulty_setting()
+	create_pain_screams()
 
 /mob/living/simple_animal/verb/verb_set_leader()
 	set name = "Follow Me"
@@ -134,32 +134,6 @@
 	else
 		visible_message("<span class = 'notice'>[src.name] seems to become more docile.</span>")
 
-/mob/living/simple_animal/proc/handle_leader_pathing()
-	if(leader_follow && get_dist(loc,leader_follow.loc) < 14 && loc != leader_follow.loc)//A bit higher than a single screen
-		if(istype(loc,/obj/vehicles))
-			var/obj/vehicles/v = loc
-			v.exit_vehicle(src,1)
-		walk_to(src,pick(orange(2,leader_follow.loc)),0,move_to_delay)
-		if(istype(leader_follow.loc,/obj/vehicles))
-			var/obj/vehicles/v = leader_follow.loc
-			if(v.Adjacent(src))
-				if(!v.enter_as_position(src,"gunner"))
-					v.visible_message("<span class = 'notice'>[name] fails to enter [v.name]'s gunner seat.</span>")
-					if(!v.enter_as_position(src,"passenger"))
-						v.visible_message("<span class = 'notice'>[name] fails to enter [v.name]'s passenger seat.</span>")
-						set_leader(null)
-					else
-						v.visible_message("<span class = 'notice'>[name] enters [v.name]'s passenger seat.</span>")
-						return 1
-				else
-					v.visible_message("<span class = 'notice'>[name] enters [v.name]'s gunner seat.</span>")
-					return 1
-	else
-		if(leader_follow && loc != leader_follow.loc)
-			set_leader(null)
-		walk(src,0)
-		return 0
-
 /mob/living/simple_animal/Life()
 	..()
 
@@ -193,26 +167,29 @@
 
 	//Movement
 	if(!client && !stop_automated_movement && wander && !anchored)
-		if(isturf(src.loc) && !resting && !buckled && canmove)		//This is so it only moves if it's not inside a closet, gentics machine, etc.
+		if((isturf(src.loc) || istype(loc,/obj/vehicles)) && !resting && !buckled && canmove)	//This is so it only moves if it's not inside a closet, gentics machine, etc.
 			turns_since_move++
 			if(turns_since_move >= turns_per_move)
-				if(!(stop_automated_movement_when_pulled && pulledby)) //Soma animals don't move when pulled
+				if(!(stop_automated_movement_when_pulled && pulledby)) //Some animals don't move when pulled
 					if(handle_leader_pathing())
 					else
 						var/moving_to = 0 // otherwise it always picks 4, fuck if I know.   Did I mention fuck BYOND
 						var/list/dirs_pickfrom = GLOB.cardinal.Copy()
 						var/allow_move = 0
+						var/move_step = null
 						while(!allow_move)
 							if(dirs_pickfrom.len == 0)
 								allow_move = 1
 								break
 							moving_to = pick(dirs_pickfrom)
-							if(!istype(get_step(src,moving_to),/turf/simulated/open))
+							move_step = get_step(loc,moving_to)
+							if(!istype(move_step,/turf/simulated/open) && isnull(locate(/obj/structure/bardbedwire) in move_step))
 								allow_move = 1
 							dirs_pickfrom -= moving_to
-						set_dir(moving_to)			//How about we turn them the direction they are moving, yay.
-						Move(get_step(src,moving_to))
-						turns_since_move = 0
+						if(move_step)
+							set_dir(moving_to)			//How about we turn them the direction they are moving, yay.
+							Move(move_step,moving_to)
+							turns_since_move = 0
 
 	//Speaking
 	if(!client && speak_chance)
@@ -279,7 +256,7 @@
 	custom_emote(2, act_desc)
 
 /mob/living/simple_animal/proc/do_pain_scream()
-	if(health <= 0)
+	if(stat == DEAD || health == 0)
 		return
 	if(world.time < next_scream_at)
 		return
@@ -293,13 +270,16 @@
 
 /mob/living/simple_animal/bullet_act(var/obj/item/projectile/Proj)
 	if(!Proj || Proj.nodamage)
-		return
+		return 0
+	var/oldhealth = health
 	if(Proj.damtype == BURN)
 		adjustFireLoss(max(0,Proj.damage-max(0,resistance-Proj.armor_penetration)))
 	else
 		adjustBruteLoss(max(0,Proj.damage-max(0,resistance-Proj.armor_penetration)))
+	if(oldhealth == health)
+		visible_message("<span class = 'notice'>[src] shrugs off \the [Proj]'s impact.</span>")
 	do_pain_scream()
-	return 0
+	return 1
 
 /mob/living/simple_animal/attack_hand(mob/living/carbon/human/M as mob)
 	..()
@@ -341,7 +321,7 @@
 							M.show_message("<span class='notice'>[user] applies the [MED] on [src].</span>")
 		else
 			to_chat(user, "<span class='notice'>\The [src] is dead, medical items won't bring \him back to life.</span>")
-		return
+		return 0
 	if((meat_type || harvest_products.len) && (stat == DEAD))	//if the animal has a meat, and if it is dead.
 		if(istype(O, /obj/item/weapon/material/knife) || istype(O, /obj/item/weapon/material/knife/butch))
 			harvest(user)
@@ -350,7 +330,7 @@
 			visible_message("<span class='notice'>[user] gently taps [src] with \the [O].</span>")
 		else
 			O.attack(src, user, user.zone_sel.selecting)
-
+			return 1
 /mob/living/simple_animal/hit_with_weapon(obj/item/O, mob/living/user, var/effective_force, var/hit_zone)
 
 	visible_message("<span class='danger'>\The [src] has been attacked with \the [O] by [user].</span>")
@@ -393,7 +373,7 @@
 	icon_state = icon_dead
 	density = 0
 	//adjustBruteLoss(maxHealth) //Make sure dey dead.
-	walk_to(src,0)
+	walk(src,0)
 	if(death_sounds.len > 0)
 		playsound(loc, pick(death_sounds),75,0,7)
 	return ..(gibbed,deathmessage,show_dead_message)

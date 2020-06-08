@@ -1,5 +1,3 @@
-#define SHIP_DEFAULT_PIXEL_SPEED 3
-#define SHIP_DEFAULT_PIXEL_ACCEL 1
 
 /obj/effect/overmap/ship
 	name = "generic ship"
@@ -55,6 +53,54 @@
 	my_pixel_transform = init_pixel_transform(src)
 	my_pixel_transform.max_pixel_speed = ship_max_speed
 	my_pixel_transform.my_observers = my_observers
+
+	create_dropship_markers()
+
+/obj/effect/overmap/ship/LateInitialize()
+	. = ..()
+	if(my_faction)
+		my_faction.all_ships.Add(src)
+
+/obj/effect/overmap/ship/Destroy()
+	if(my_faction)
+		my_faction.all_ships.Remove(src)
+	. = ..()
+
+//Creates dropship markers for each z-level, for each cardinal direction.
+/obj/effect/overmap/ship/proc/create_dropship_markers()
+	for(var/i = 1 to map_z.len)
+		for(var/n in list("North","East","South","West"))//1 for each cardinal direction
+			var/using_axis_x = 0 //if this is ticked, the y axis becomes static
+			var/use_opposite_side = 0
+			switch(n)
+				if("North")
+					using_axis_x = 1
+					use_opposite_side = 1
+				if("East")
+					use_opposite_side = 1
+				if("South")
+					using_axis_x = 1
+
+			var/turf/point_at
+			var/z_level = map_z[i]
+			var/midpoint = 0
+			if(using_axis_x)
+				midpoint = (map_bounds[1] + map_bounds[3]) /2
+			else
+				midpoint = (map_bounds[2] + map_bounds[4]) /2
+			if(use_opposite_side) //EAST/SOUTH
+				if(using_axis_x)
+					point_at = locate(midpoint,map_bounds[4],z_level)
+				else
+					point_at = locate(map_bounds[3],midpoint,z_level)
+			else
+				if(using_axis_x)
+					point_at = locate(midpoint,map_bounds[2],z_level)
+				else
+					point_at = locate(map_bounds[1],midpoint,z_level)
+			if(point_at)
+				var/obj/point = new /obj/effect/landmark/dropship_land_point (point_at)
+				point.name = "Level [i] - [n]"
 
 /obj/effect/overmap/ship/proc/assign_fleet(var/assign)
 	if(our_fleet == assign)
@@ -224,12 +270,21 @@
 
 /obj/effect/overmap/ship/proc/break_umbilicals(var/force_break = 0)
 	for(var/obj/docking_umbilical/umbi in connectors)
+		if(isnull(umbi))
+			connectors -= umbi
+			continue
 		if(force_break || (umbi.current_connected && get_dist(umbi.our_ship,umbi.current_connected.our_ship) > 1))
-			umbi.current_connected.umbi_rip()
+			if(umbi.current_connected)
+				umbi.current_connected.umbi_rip()
 			umbi.umbi_rip()
 
 /obj/effect/overmap/ship/do_superstructure_fail()
 	break_umbilicals(1)
+	. = ..()
+
+/obj/effect/overmap/ship/Crossed(var/obj/item/projectile/crosser)
+	if(istype(crosser))
+		crosser.Bump(src)
 	. = ..()
 
 /*

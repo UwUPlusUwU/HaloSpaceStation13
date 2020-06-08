@@ -116,19 +116,23 @@
 
 	if(!istype(overmap_object))
 		return 0
-	if(!(starting in range(1,impacted)) && prob(overmap_object.weapon_miss_chance * (1- accuracy/100))) //accuracy = 1 means miss chance is multiplied by 0.99
+	if(!(starting in trange(1,impacted)) && prob(overmap_object.weapon_miss_chance * (1- accuracy/100))) //accuracy = 1 means miss chance is multiplied by 0.99
 		visible_message("<span class = 'warning'>[src] flies past [impacted].</span>")
 		return 0
 	if(istype(impacted,/obj/effect/overmap/ship/npc_ship))
 		var/obj/effect/overmap/ship/npc_ship/ship = impacted
 		if(ship.unload_at)
 			ship.take_projectiles(src,0)
-			chosen_impact_z = pick(overmap_object.map_z)
-			do_z_level_proj_spawn(chosen_impact_z,overmap_object)
+			if(overmap_object.map_z.len > 0)
+				chosen_impact_z = pick(overmap_object.map_z)
+				do_z_level_proj_spawn(chosen_impact_z,overmap_object)
 			qdel(src)
+			return
 		else
 			ship.take_projectiles(src)
 			return 0
+	if(overmap_object.map_z.len == 0)
+		return
 	chosen_impact_z = pick(overmap_object.map_z)
 	if(istype(impacted,/obj/effect/overmap/sector))
 		do_sector_hit(overmap_object.map_z[1],impacted) //this is so it only hits the upper z-levels in planets

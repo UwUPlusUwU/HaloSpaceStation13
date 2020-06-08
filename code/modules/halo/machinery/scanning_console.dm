@@ -44,7 +44,7 @@
 
 /obj/item/projectile/overmap/ship_scanner/scanner_projectile/on_impact(var/atom/impacted)
 	var/obj/effect/overmap/om_obj = impacted
-	if(isnull(om_obj) || isnull(console_fired_by))
+	if(!istype(om_obj) || isnull(console_fired_by))
 		return
 	var/obj/effect/overmap/ship/npc_ship/npc = om_obj
 	if(om_obj.hull_segments.len == 0 && !istype(npc))
@@ -59,5 +59,4 @@
 	qdel(src)
 
 /obj/machinery/overmap_weapon_console/ship_scanning_console/cov
-	icon = 'code/modules/halo/icons/machinery/covenant/consoles.dmi'
 	icon_state = "covie_console"

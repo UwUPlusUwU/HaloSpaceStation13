@@ -54,7 +54,7 @@
 	var/obj/O = A
 	return (istype(O) && O.hides_under_flooring()) || ..()
 
-/turf/simulated/wall/process(wait, times_fired)
+/turf/simulated/wall/process(wait = 1, times_fired = 0)
 	var/how_often = max(round(2 SECONDS/wait), 1)
 	if(times_fired % how_often)
 		return //We only work about every 2 seconds
@@ -236,14 +236,18 @@
 	O.plane = LIGHTING_PLANE
 	O.layer = FIRE_LAYER
 
-	src.ChangeTurf(/turf/simulated/floor/plating)
+	var/material/wallmat = get_material_by_name(DEFAULT_WALL_MATERIAL)
+	var/burn_time =  10 SECONDS
+	if(src) //apparently a bug can happen where this is triggered after a wall self-deconstructs
+		burn_time = 100 * (max_health()/wallmat.integrity)
+	src.ChangeTurf(floor_type)
 
 	var/turf/simulated/floor/F = src
 	F.burn_tile()
 	F.icon_state = "wall_thermite"
-	to_chat(user, "<span class='warning'>The thermite starts melting through the wall.</span>")
+	to_chat(user, "<span class='warning'>The thermite starts melting through the wall. You estimate it'll take [round(burn_time/60)] minutes.</span>")
 
-	spawn(100)
+	spawn(burn_time)
 		if(O)
 			qdel(O)
 //	F.sd_LumReset()		//TODO: ~Carn

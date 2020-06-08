@@ -34,18 +34,19 @@
 	var/list/allowed_branches             // For maps using branches and ranks, also expandable for other purposes
 	var/list/allowed_ranks                // Ditto
 
-	var/announced = FALSE                  //If their arrival is announced on radio
+	var/announced = TRUE                  //If their arrival is announced on radio
 	var/latejoin_at_spawnpoints           //If this job should use roundstart spawnpoints for latejoin (offstation jobs etc)
 
 	var/generate_email = 0
 	var/track_players = 0
 	var/list/assigned_players = list()
-	var/spawn_faction
 	var/is_whitelisted = 0
 	var/spawnpoint_override = null //If set: This will override player-chosen spawnpoints. Text string of spawnpoint's display name.
 	var/list/blacklisted_species = list()		//job cannot be filled by these species
 	var/list/whitelisted_species = list()		//job can only be filled by these species
 	var/open_slot_on_death = 0
+
+	var/fallback_spawnpoint //If set, this will, on failure to find any spawnpoints, permemnantly switch the spawn_override to this.
 
 	var/poplock_divisor = 1
 	var/poplock_max = 1
@@ -66,7 +67,8 @@
 	if(!outfit)
 		return FALSE
 	. = outfit.equip(H, title, alt_title)
-
+	if(ismob(.))
+		H = .
 	if(spawn_faction)
 		H.faction = spawn_faction
 		if(ticker.mode)

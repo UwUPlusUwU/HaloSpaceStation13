@@ -50,7 +50,7 @@
 		comps_to_dam = vital_components
 	for(var/obj/item/vehicle_component/component in comps_to_dam)
 		var/comp_resistance = component.get_resistance_for("bomb")
-		component.damage_integrity(400/ex_severity * (1- comp_resistance/100),)
+		component.damage_integrity(600/ex_severity * (1- comp_resistance/100),)
 
 /datum/component_profile/proc/give_gunner_weapons(var/obj/vehicles/source_vehicle)
 	var/list/gunners = source_vehicle.get_occupants_in_position(pos_to_check)
@@ -70,6 +70,9 @@
 	if(!(gun.type in gunner_weapons))
 		return 0
 	var/list/gunners = source_vehicle.get_occupants_in_position(pos_to_check)
+	if(source_vehicle.guns_disabled)
+		to_chat(user,"<span class = 'notice'>[source_vehicle]'s weapons have been heavily damaged.</span>")
+		return 0
 	if(user in gunners)
 		return 1
 	else
@@ -203,7 +206,7 @@
 		return
 	else if(new_integ > initial(integrity))
 		integrity = initial(integrity)
-	else if(new_integ < 0)
+	else if(new_integ <= 0)
 		integrity = 0
 		full_integ_loss()
 	else

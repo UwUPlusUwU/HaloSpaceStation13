@@ -289,7 +289,14 @@
 	if(!job.player_old_enough(src.client))	return 0
 	if(ticker.mode.disabled_jobs.Find(job.title))	return 0
 	if(ticker.mode.disabled_jobs_types.Find(job.type))	return 0
-	if(!job_master.get_spawnpoint_for(src.client, job, 1))	return 0
+	if(!job_master.get_spawnpoint_for(src.client, job, 1))
+		if(job.fallback_spawnpoint)
+			job.spawnpoint_override = job.fallback_spawnpoint
+			job.fallback_spawnpoint = null //Set the fallback to null because we don't want it to start falling back to itself, if the fallback also fails.
+			to_chat(src,"<span class = 'notice'>Job spawning failed due to unavailable spawnpoints for selected job. Now using defined fallback spawnpoint.</span>")
+			if(job_master.get_spawnpoint_for(src.client, job, 1))
+				return 1
+		return 0
 
 	return 1
 
@@ -347,7 +354,8 @@
 		var/mob/living/silicon/ai/A = character
 		A.on_mob_init()
 
-		AnnounceCyborg(character, job.title, "has been downloaded to the empty core in \the [character.loc.loc]")
+		if(job.announced)
+			AnnounceCyborg(character, job.title, "has been downloaded to the empty core in \the [character.loc.loc]")
 		ticker.mode.handle_latejoin(character)
 
 		qdel(C)
@@ -360,11 +368,12 @@
 		if(character.mind.assigned_role != "Cyborg")
 			GLOB.data_core.manifest_inject(character)
 			ticker.minds += character.mind//Cyborgs and AIs handle this in the transform proc.	//TODO!!!!! ~Carn
-		else
+		else if(job.announced)
 			AnnounceCyborg(character, job, spawnpoint.msg)
 		matchmaker.do_matchmaking()
-	AnnounceArrival(character, job, spawnpoint.msg)
-	log_and_message_admins("has joined the round as [character.mind.assigned_role].", character)
+	if(job.announced)
+		AnnounceArrival(character, job, spawnpoint.msg)
+	log_admin("has joined the round as [character.mind.assigned_role].", character)
 	qdel(src)
 
 
@@ -374,7 +383,7 @@
 			rank = character.mind.role_alt_title
 		// can't use their name here, since cyborg namepicking is done post-spawn, so we'll just say "A new Cyborg has arrived"/"A new Android has arrived"/etc.
 		GLOB.global_announcer.autosay("A new[rank ? " [rank]" : " visitor" ] [join_message ? join_message : "has arrived"].", "Arrivals Announcement Computer")
-		log_and_message_admins("has joined the round as [character.mind.assigned_role].", character)
+		log_admin("has joined the round as [character.mind.assigned_role].", character)
 
 /mob/new_player/proc/LateChoices()
 	var/name = client.prefs.be_random_name ? "friend" : client.prefs.real_name

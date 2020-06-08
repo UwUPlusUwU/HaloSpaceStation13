@@ -1,36 +1,20 @@
 
 /datum/map/geminus_city
 	allowed_jobs = list(\
-		/datum/job/researchdirector,\
-		/datum/job/ONIGUARDS,\
-		/datum/job/researcher,\
-		/datum/job/ONIGUARD,\
-		/datum/job/insurrectionist_ai,\
-		/datum/job/geminus_innie,\
-		/datum/job/geminus_innie/officer,\
-		/datum/job/geminus_innie/commander,\
-		/datum/job/geminus_innie/orion_defector,\
-		/datum/job/insurrectionist_ai,\
-		/datum/job/soe_commando,\
-		/datum/job/soe_commando_officer,\
-		/datum/job/soe_commando_captain,\
-		/datum/job/geminus_x52/researcher,\
-		/datum/job/geminus_x52/research_director,\
-		/datum/job/unsc_ship_ai,\
-		/datum/job/unscbertels_co,\
-		/datum/job/unscbertels_xo,\
-		/datum/job/bertelsunsc_ship_marine,\
-		/datum/job/unsc_ship_marinesquad,\
-		/datum/job/unscbertels_ship_crew,\
-		/datum/job/unsc_ship_iwo,\
-		/datum/job/unsc_ship_marinesergeant,\
-		/datum/job/unsc_ship_marineplatoon,\
-		/datum/job/bertelsODST,\
-		/datum/job/bertelsODSTO,\
+		/datum/job/unsc/crew,\
+		/datum/job/unsc/medical,\
+		/datum/job/unsc/marine,\
+		/datum/job/unsc/marine/specialist,\
+		/datum/job/unsc/marine/squad_leader,\
+		/datum/job/unsc/odst,\
+		/datum/job/unsc/odst/squad_leader,\
+		/datum/job/unsc/commanding_officer,\
+		/datum/job/unsc/executive_officer,\
+		/datum/job/unsc/oni/research,\
 		/datum/job/colonist,\
-		/datum/job/colonist_mayor,\
-		/datum/job/police,\
-		/datum/job/police_chief,\
+		/datum/job/colonist/mayor,\
+		/datum/job/colonist/police,\
+		/datum/job/colonist/police/chief,\
 		/datum/job/covenant/huragok,\
 		/datum/job/covenant/AI,\
 		/datum/job/covenant/sangheili_minor,\
@@ -51,20 +35,12 @@
 		/datum/job/covenant/yanmee_major,\
 		/datum/job/covenant/yanmee_ultra,\
 		/datum/job/covenant/yanmee_leader,\
-		/datum/job/ONI_Spartan_II,\
 		)
 
 	allowed_spawns = list(\
 		DEFAULT_SPAWNPOINT_ID,\
-		"Geminus Innie",\
-		"Listening Post Spawn",\
-		"Colony Arrival Shuttle",\
 		"UNSC Base Spawns",\
-		"Research Facility Spawn",\
-		"Research Facility Director Spawn",\
-		"Research Facility Security Spawn",\
-		"X52 Researcher",\
-		"X52 RD",\
+		"UNSC Base Fallback Spawns"\
 		)
 
 	default_spawn = DEFAULT_SPAWNPOINT_ID

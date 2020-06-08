@@ -13,9 +13,11 @@
 	caliber = "cov_carbine"
 	load_method = MAGAZINE
 	reload_sound = 'code/modules/halo/sounds/cov_carbine_reload.ogg'
+	fire_delay = 5 //Doesn't have the 3rnd burst of the counterpart BR
+	dispersion = list(0.26)
 	one_hand_penalty = -1
-	irradiate_non_cov = 10
-	accuracy = 2
+	irradiate_non_cov = 12
+	accuracy = 1
 	wielded_item_state = "carbine-wielded"
 	advanced_covenant = 1
 
@@ -56,17 +58,19 @@
 	slot_flags = SLOT_BACK
 	fire_sound = 'code/modules/halo/sounds/beam_rifle_fire.ogg'
 	charge_meter = 0
-	max_shots = 10
+	max_shots = 16
 	projectile_type = /obj/item/projectile/bullet/covenant/beamrifle
 	one_hand_penalty = -1
-	irradiate_non_cov = 15
+	irradiate_non_cov = 17
 	wielded_item_state = "beamrifle-wielded"
-	fire_delay = 0 //Click as fast as you want. we have an overcharge system to deal with spamming
-	accuracy = -5
+	fire_delay = 10
+	accuracy = -10
+	dispersion = list(0.1)
 	scoped_accuracy = 7
 	advanced_covenant = 1
-
-	var/next_allowed_fire
+	overheat_sfx = 'code/modules/halo/sounds/beam_rifle_overheat.ogg'
+	overheat_capacity = 4 //SRS mag equiv, but overheats on 4th click
+	overheat_fullclear_delay = 40
 
 	item_icons = list(
 		slot_l_hand_str = 'code/modules/halo/weapons/icons/Weapon_Inhands_left.dmi',
@@ -84,18 +88,6 @@
 	set popup_menu = 1
 
 	toggle_scope(usr, 1.75)
-
-/obj/item/weapon/gun/energy/beam_rifle/proc/update_next_allowed_fire(var/seconds_increase = 1.25)
-	next_allowed_fire = world.time + seconds_increase SECONDS
-
-/obj/item/weapon/gun/energy/beam_rifle/Fire(atom/target,var/mob/living/user)
-	if(world.time < next_allowed_fire)
-		update_next_allowed_fire(3)
-		playsound(user,'code/modules/halo/sounds/beam_rifle_overheat.ogg',100,1)
-		to_chat(user,"<span class = 'warning'>[src.name]'s automatic cooling system activates, halting the firing process!</span>")
-	else
-		update_next_allowed_fire()
-		. = ..()
 
 /obj/item/weapon/gun/energy/beam_rifle/proc/cov_plasma_recharge_tick()
 	if(max_shots > 0)
@@ -119,9 +111,9 @@
 	load_method = MAGAZINE
 	reload_sound = 'code/modules/halo/sounds/cov_needlerifle_reload.ogg'
 	one_hand_penalty = -1
+	dispersion = list(0.26)
 	accuracy = 2
 	wielded_item_state = "needlerifle-wielded"
-	advanced_covenant = 1
 
 	item_icons = list(
 		slot_l_hand_str = 'code/modules/halo/weapons/icons/Weapon_Inhands_left.dmi',

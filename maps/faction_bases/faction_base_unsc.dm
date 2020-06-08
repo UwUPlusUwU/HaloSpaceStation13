@@ -14,18 +14,16 @@ GLOBAL_LIST_EMPTY(unsc_base_spawns)
 /datum/spawnpoint/unsc_base
 	display_name = "UNSC Base Spawns"
 	restrict_job_type = list(\
-		/datum/job/bertelsODST,\
-		/datum/job/bertelsODSTO,\
-		/datum/job/unsc_ship_marineplatoon,\
-		/datum/job/bertelsunsc_ship_marine,\
-		/datum/job/unsc_ship_iwo,\
-		/datum/job/unscbertels_xo,\
-		/datum/job/unscbertels_co,\
-		/datum/job/unscbertels_medical_crew,\
-		/datum/job/unscbertels_ship_crew,\
-		/datum/job/unsc_ship_marinesergeant,\
-		/datum/job/unsc_ship_marinesquad,\
-)
+	/datum/job/unsc/crew,\
+	/datum/job/unsc/medical,\
+	/datum/job/unsc/marine,\
+	/datum/job/unsc/marine/specialist,\
+	/datum/job/unsc/marine/squad_leader,\
+	/datum/job/unsc/commanding_officer,\
+	/datum/job/unsc/executive_officer,\
+	/datum/job/unsc/oni/research,\
+	/datum/job/unsc/odst,\
+	/datum/job/unsc/odst/squad_leader)
 
 /datum/spawnpoint/unsc_base/New()
 	..()
@@ -47,3 +45,28 @@ GLOBAL_LIST_EMPTY(unsc_base_spawns)
 	name = "UNSC Shuttle"
 	icon_state = "shuttle"
 */
+
+GLOBAL_LIST_EMPTY(unsc_base_fallback_spawns)
+
+/datum/spawnpoint/unsc_base_fallback
+	display_name = "UNSC Base Fallback Spawns"
+	restrict_job_type = list(\
+	/datum/job/unsc/marine,\
+	/datum/job/unsc/marine/specialist,\
+	/datum/job/unsc/marine/squad_leader,\
+	/datum/job/unsc/commanding_officer,\
+	/datum/job/unsc/executive_officer,\
+	/datum/job/unsc/oni/research,\
+	/datum/job/unsc/odst,\
+	/datum/job/unsc/odst/squad_leader)
+
+/datum/spawnpoint/unsc_base_fallback/New()
+	..()
+	turfs = GLOB.unsc_base_fallback_spawns
+
+/obj/effect/landmark/start/unsc_base_fallback
+	name = "UNSC Base Fallback Spawns"
+
+/obj/effect/landmark/start/unsc_base_fallback/New()
+	..()
+	GLOB.unsc_base_fallback_spawns += loc

@@ -24,11 +24,11 @@
 	projectile_type = /obj/item/projectile/bullet/a127_saphe
 
 /obj/item/projectile/bullet/a127_saphe
-	damage = 55		//deadly but inaccurate
-	accuracy = -1
+	damage = 55		//deadly but no AP
 
 /obj/item/projectile/bullet/a127
 	damage = 25
+	accuracy = 1
 
 /obj/item/weapon/storage/box/m127_saphe
 	name = "box of 12.7mm M225 magazines"
@@ -76,8 +76,7 @@
 //deadly but inaccurate
 /obj/item/projectile/bullet/a127_saphp
 	damage = 40
-	armor_penetration = 20
-	accuracy = 1
+	armor_penetration = 10
 
 /obj/item/weapon/storage/box/m127_saphp
 	name = "box of 12.7mm M228 magazines"
@@ -197,8 +196,9 @@
 	caliber = "9.5mm"
 	projectile_type = /obj/item/projectile/bullet/m95_sap
 
-/obj/item/projectile/bullet/m95_sap
-	damage = 35
+/obj/item/projectile/bullet/m95_sap //it fires 3 of these in functionally a straight line, so individual damage is lower
+	damage = 15
+	shield_damage = 5
 
 /obj/item/weapon/storage/box/m95_sap
 	name = "box of 9.5mm M634 magazines"
@@ -243,7 +243,7 @@
 	icon_state = "SRS99mag"
 	mag_type = MAGAZINE
 	ammo_type = /obj/item/ammo_casing/a145_ap
-	matter = list(DEFAULT_WALL_MATERIAL = 4000) //7.62mm casing = 50 metal each
+	matter = list(DEFAULT_WALL_MATERIAL = 10000)
 	caliber = "14.5mm"
 	max_ammo = 4
 	multiple_sprites = 1
@@ -259,20 +259,22 @@
 	projectile_type = /obj/item/projectile/bullet/a145_ap/tracerless
 
 /obj/item/projectile/bullet/a145_ap
-	damage = 60
-	step_delay = 0.1
+	damage = 55
+	armor_penetration = 60
+	step_delay = 0
 	penetrating = 5
-	armor_penetration = 65
 	tracer_type = /obj/effect/projectile/srs99
 	tracer_delay_time = 2 SECONDS
+	shield_damage = 210
 
 /obj/item/projectile/bullet/a145_ap/tracerless //Modified slightly to provide a downside for using the innie-heavy-sniper-rounds over normal rounds.
-	damage = 50
-	armor_penetration = 70
+	damage = 55
+	armor_penetration = 55
 	tracer_type = null
 	tracer_delay_time = null
 	pin_range = 3
 	pin_chance = 70
+	shield_damage = 150
 
 /obj/effect/projectile/srs99
 	icon = 'code/modules/halo/weapons/icons/Weapon Sprites.dmi'
@@ -312,13 +314,15 @@
 	projectile_type = /obj/item/projectile/bullet/m5/rubber
 
 /obj/item/projectile/bullet/m5
-	damage = 25
+	damage = 20
+	shield_damage = 10
 
 /obj/item/projectile/bullet/m5/rubber //"rubber" bullets
 	name = "rubber bullet"
 	check_armour = "melee"
 	damage = 5
-	agony = 25
+	shield_damage = 0
+	agony = 20
 	embed = 0
 	sharp = 0
 
@@ -374,6 +378,7 @@
 	icon = 'code/modules/halo/weapons/icons/Weapon Sprites.dmi'
 	check_armour = "bomb"
 	step_delay = 1.2
+	shield_damage = 200 //just below elite minor shields, meaning subsequent explosion and guaranteed damage will collapse it.
 
 /obj/item/projectile/bullet/ssr/on_impact(var/atom/target)
 	explosion(target, 0, 1, 2, 4,guaranteed_damage = 50,guaranteed_damage_range = 2)
@@ -381,13 +386,13 @@
 
 /obj/item/weapon/storage/box/spnkr
 	name = "102mm HEAT SPNKr crate"
-	desc = "UNSC certified crate containing two tubes of SPNKr rockets for a total of four rockets to be loaded in the M41 SSR."
+	desc = "UNSC certified crate containing four tubes of SPNKr rockets for a total of eight rockets to be loaded in the M41 SSR."
 	icon = 'code/modules/halo/icons/objs/halohumanmisc.dmi'
 	icon_state = "ssrcrate"
-	max_storage_space = base_storage_capacity(6)
-	startswith = list(/obj/item/ammo_magazine/spnkr = 2)
+	max_storage_space = base_storage_capacity(12)
+	startswith = list(/obj/item/ammo_magazine/spnkr = 4)
 	can_hold = list(/obj/item/ammo_magazine/spnkr)
-	slot_flags = SLOT_BACK
+	slot_flags = SLOT_BACK | SLOT_BELT
 	max_w_class = ITEM_SIZE_HUGE
 
 //ACL-55 rocket launcher
@@ -412,6 +417,7 @@
 	icon = 'code/modules/halo/weapons/icons/Weapon Sprites.dmi'
 	check_armour = "bomb"
 	step_delay = 1.2
+	shield_damage = 200
 
 /obj/item/projectile/bullet/m26/on_impact(var/atom/target)
 	explosion(target, 0, 1, 2, 4,guaranteed_damage = 50,guaranteed_damage_range = 2)

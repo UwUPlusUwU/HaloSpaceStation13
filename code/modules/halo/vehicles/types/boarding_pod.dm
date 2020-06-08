@@ -7,7 +7,8 @@
 	launch_arm_time = 5 SECONDS
 	drop_accuracy = 5
 	occupants = list(8,0)
-	pod_range = 8
+	pod_range = 14
+	internal_air = new
 
 	light_color = "#E1FDFF"
 
@@ -31,7 +32,7 @@
 		if(istype(t,/turf/unsimulated/floor))
 			valid_points += t
 			continue
-	if(isnull(valid_points))
+	if(isnull(valid_points) || valid_points.len == 0)
 		error("DROP POD FAILED TO LAUNCH: COULD NOT FIND ANY VALID DROP-POINTS")
 		return
 	return pick(valid_points)
@@ -41,9 +42,15 @@
 	var/obj/effect/overmap/om_obj = map_sectors["[drop_turf.z]"]
 	if(istype(om_obj,/obj/effect/overmap/sector)) //Let's not send a message if we're dropping onto a planet.
 		return
-	for(var/mob/living/m in GLOB.player_list)
-		if(m.z in om_obj.map_z)
+	spawn(30 SECONDS)
+		for(var/mob/living/m in GLOB.mobs_in_sectors[om_obj])
 			to_chat(m,"<span class = 'danger'>EXTERNAL INCURSION WARNING: BOARDING POD COLLISION DETECTED. LOCATION: [drop_turf.loc.name]</span>")
+
+/obj/vehicles/drop_pod/overmap/boarding_pod/get_overmap_targets()
+	var/list/potential_om_targ = list()
+	for(var/obj/effect/overmap/ship/o in (range(pod_range,map_sectors["[z]"]) - map_sectors["[z]"]))
+		potential_om_targ["[o.name]"] = o
+	return potential_om_targ
 
 /obj/vehicles/drop_pod/overmap/boarding_pod
 	name = "Class-3 Armoured Boarding Pod"
